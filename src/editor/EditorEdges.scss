@@ -1,0 +1,29 @@
+.editor-view {
+  .editor-view-svg {
+    // é²æ­¢svgç»å¸æ¡ä½èåå³é®
+    width: 1px;
+    overflow: visible;
+  }
+
+  .link-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    background: #ebeaef;
+    display: flex;
+    align-items: center;
+
+    .one-icon {
+      font-size: 18px;
+      color: #b4bdcf;
+    }
+
+    .active-icon {
+      color: #92ade3;
+    }
+
+    .linked-icon {
+      color: #b4bdcf;
+    }
+  }
+}
