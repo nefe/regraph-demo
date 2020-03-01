@@ -120,8 +120,14 @@ export function EditorNode(props: EditorNodeProps) {
     borderColor = `${currentNode.key}-border`;
   }
 
-  // 是否是圆形，TODO: 后续放开多边形
+  // 是否是圆形
   const isCircle = currentNode.key === "circle";
+
+  // 是否为圆角
+  const isRadius = currentNode.key === 'rectRadius';
+
+  // 是否为菱形
+  const isDiamond = currentNode.key === 'diamond';
 
   const borderClass = classNames(
     "editorNode-box",
@@ -129,7 +135,8 @@ export function EditorNode(props: EditorNodeProps) {
     {
       dragging: isDragged
     },
-    { "editorNode-circle": isCircle }
+    { "editorNode-circle": isCircle },
+    { "editorNode-rectRadius": isRadius},
   );
 
   const menuList = [
@@ -189,7 +196,7 @@ export function EditorNode(props: EditorNodeProps) {
       onContextMenu={interactive ? onContextMenu : null}
     >
       <div className="editorNode" ref={editorNodeRef}>
-        <div className={borderClass}>
+        <div className={borderClass} style={ { transform: isDiamond?`rotateZ(45deg) skew(30deg,30deg)`: 'none'}}>
           <div className="editorNode-box-property">
             <div className="editorNode-name">{currentNode.name}</div>
           </div>

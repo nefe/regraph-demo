@@ -28,43 +28,43 @@ export default function EditorDemo(props) {
     setCopiedNodes
   } = useEditorStore();
 
-  // ç»å¸å®¹å¨
+  // 画布容器
   const screenRef = useRef(null);
 
-  // ç»å¸ ref
+  // 画布 ref
   const canvasRef = useRef({
     getWrappedInstance: () => Object
   } as any);
 
   const canvasInstance = canvasRef.current;
 
-  /** å é¤ç»ä»¶ */
+  /** 删除组件 */
   const handleDeleteNodes = (ids: string[]) => {
     if (!ids) {
       return;
     }
-    // å é¤ä¸ç»ä»¶ç¸è¿çè¿çº¿ï¼ä¸è®ºä¸æ¸¸æä¸æ¸¸
+    // 删除与组件相连的连线，不论上游或下游
 
     const newLinks = _.cloneDeep(links);
     ids.forEach(id => {
-      // å é¤ä¸èç¹è¿æ¥çä»»æè¾¹
+      // 删除与节点连接的任意边
       _.remove(newLinks, link => link.source === id || link.target === id);
     });
-    // æ´æ°è¿çº¿
+    // 更新连线
     setLinks(newLinks);
 
-    // åé¤components
+    // 剔除components
     const cloneNodes = _.cloneDeep(nodes);
     const newNodes = _.remove(cloneNodes, item => !ids.includes(item.id));
 
     setNodes(newNodes);
 
-    // æ¸ç©ºé«äº®ç¶æ
+    // 清空高亮状态
     setSelectedLinks([]);
     setSelectedNodes([]);
   };
 
-  /** å é¤è¿çº¿ */
+  /** 删除连线 */
   const handleDeleteLinks = (activeLinks: string[]) => {
     if (!activeLinks) {
       return;
@@ -75,7 +75,7 @@ export default function EditorDemo(props) {
     setLinks(newLinks);
   };
 
-  /** å¤å¶èç¹ */
+  /** 复制节点 */
   const handleNodesCopy = (ids: string[]) => {
     const newCopiedNodes = ids.map(id => {
       return _.find(nodes, item => item.id === id);
@@ -84,14 +84,14 @@ export default function EditorDemo(props) {
     setCopiedNodes(newCopiedNodes);
   };
 
-  /** ç²è´´èç¹ */
+  /** 粘贴节点 */
   const handleNodesPaste = () => {
     if (copiedNodes) {
       const currentCopied = copiedNodes.map(node => {
         return {
           ...node,
           id: uuid.v4(),
-          /**  @todo åç»­å¯ä¼åå¸å±ç®æ³ */
+          /**  @todo 后续可优化布局算法 */
           x: node.x + node.width + 20,
           ref: React.createRef()
         };
@@ -101,7 +101,7 @@ export default function EditorDemo(props) {
     }
   };
 
-  // åªå
+  // 剪切
   const handleShear = () => {
     if (selectedNodes) {
       handleNodesCopy(selectedNodes);
@@ -109,21 +109,21 @@ export default function EditorDemo(props) {
     }
   };
 
-  // å¤å¶
+  // 复制
   const handleCopy = () => {
     if (selectedNodes) {
       handleNodesCopy(selectedNodes);
     }
   };
 
-  // ç²è´´
+  // 粘贴
   const handlePaste = () => {
     if (copiedNodes) {
       handleNodesPaste();
     }
   };
 
-  // å é¤
+  // 删除
   const handleDelete = () => {
     if (selectedNodes) {
       handleDeleteNodes(selectedNodes);
@@ -159,7 +159,7 @@ export default function EditorDemo(props) {
 
   
 
-  /** æä½åº */
+  /** 操作区 */
   const renderOperation = (
     <div>
       <Toolbar
@@ -176,14 +176,14 @@ export default function EditorDemo(props) {
       />
     </div>
   );
-  /** æ¸²æèç¹éæ©åº */
+  /** 渲染节点选择区 */
   const renderNodePanel = (
     <div className="editor-nodePanel">
       <NodePanel onDrag={setDragNode} />
     </div>
   );
 
-  /** æ¸²æä¸­é´ç»å¸åº */
+  /** 渲染中间画布区 */
   const renderCanvas = (
     <div className="editor-canvas">
       <CanvasContent
@@ -207,7 +207,7 @@ export default function EditorDemo(props) {
     </div>
   );
 
-  /** æ¸²æéç½®åº */
+  /** 渲染配置区 */
   const renderProperty = <div className="editor-property"></div>;
 
   return (

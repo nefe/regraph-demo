@@ -2,7 +2,6 @@
   width: 100%;
   height: 100%;
 
-  // é¡¶é¨æ§å¶æ¡é«åº¦
   $barHeight: 33px;
   $textColor: #4c4c4c;
   $activeColor: #d9dbe8;
@@ -154,4 +153,14 @@
       }
     }
   }
+
+  .diamond {
+    width: 36px; 
+    height: 36px; 
+    margin-top:5px;
+    transform:rotate(-45deg); 
+    background: transparent;
+    border:2px solid rgb(82, 97, 155);
+  }
+ 
 }

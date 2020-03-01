@@ -12,11 +12,11 @@
     border-color: #6ca0f5;
   }
 
-  .polygon-border {
+  .rectRadius-border {
     border-color: #65ca92;
   }
 
-  .ellipse-border {
+  .diamond-border {
     border-color: #c6aaa7;
   }
 
@@ -28,11 +28,11 @@
     background: #6ca0f5;
   }
 
-  .polygon-bgColor {
+  .rectRadius-bgColor {
     background: #65ca92;
   }
 
-  .ellipse-bgColor {
+  .diamond-bgColor {
     background: #c6aaa7;
   }
 
@@ -44,11 +44,11 @@
     border-color: #5084d8;
   }
 
-  .polygon-clicked {
+  .rectRadius-clicked {
     border-color: #3b9262;
   }
 
-  .ellipse-clicked {
+  .diamond-clicked {
     border-color: #906e6a;
   }
 
@@ -64,11 +64,11 @@
     background: #5084d8;
   }
 
-  .polygon-parallel-clicked {
+  .rectRadius-parallel-clicked {
     background: #3b9262;
   }
 
-  .ellipse-parallel-clicked {
+  .diamond-parallel-clicked {
     background: #906e6a;
   }
 
@@ -111,3 +111,8 @@
 .editorNode-circle {
   border-radius: 50%;
 }
+
+.editorNode-rectRadius {
+  border-radius: 15px;
+}
+

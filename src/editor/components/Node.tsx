@@ -164,7 +164,6 @@ const Node = React.forwardRef((props: NodeProps, ref: any) => {
             data-type="edge"
             data-position={item.position}
             key={item.position}
-            href="javascript:void(0)"
             className={`node-selector`}
             style={item.style}
           />

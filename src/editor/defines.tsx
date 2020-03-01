@@ -154,7 +154,9 @@ export const LINKICON_HEIGHT = 18;
 
 export enum ComponentKey {
   rect = "rect",
+  rectRadius = 'rectRadius',
   circle = "circle",
+  diamond = "diamond",
   polygon = "polygon",
   ellipse = "ellipse",
   star = "star"
@@ -172,6 +174,18 @@ const COMMON_COMPONENT: Node[] = [
     height: 100,
     icon: (
       <div style={{ width: 36, height: 36, border: "2px solid #52619b" }} />
+    ),
+    disabled: false
+  },
+  /** 矩形带圆角 */
+  {
+    type: ComponentType.common,
+    key: ComponentKey.rectRadius,
+    name: "RECT-RADIU",
+    width: 100,
+    height: 100,
+    icon: (
+      <div style={{ width: 36, height: 36, border: "2px solid #52619b", borderRadius: 10 }} />
     ),
     disabled: false
   },
@@ -200,7 +214,21 @@ const COMMON_COMPONENT: Node[] = [
       </svg>
     ),
     disabled: false
-  }
+  },
+  /** TODO 菱形 */
+  // {
+  //   type: ComponentType.common,
+  //   key: ComponentKey.diamond,
+  //   name: "DIAMOND",
+  //   width: 100,
+  //   height: 100,
+  //   icon: (
+  //     <div className="diamond">
+        
+  //     </div>
+  //   ),
+  //   disabled: false
+  // }
   /** 多边形 */
   // {
   //   type: ComponentType.common,
