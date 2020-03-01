@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/regraph-demo/static/css/main.7a338e7c.chunk.css",
+    "main.js": "/regraph-demo/static/js/main.c4b3814f.chunk.js",
+    "main.js.map": "/regraph-demo/static/js/main.c4b3814f.chunk.js.map",
+    "runtime-main.js": "/regraph-demo/static/js/runtime-main.499d57d8.js",
+    "runtime-main.js.map": "/regraph-demo/static/js/runtime-main.499d57d8.js.map",
+    "static/css/2.74e1a1f8.chunk.css": "/regraph-demo/static/css/2.74e1a1f8.chunk.css",
+    "static/js/2.aaf2f18a.chunk.js": "/regraph-demo/static/js/2.aaf2f18a.chunk.js",
+    "static/js/2.aaf2f18a.chunk.js.map": "/regraph-demo/static/js/2.aaf2f18a.chunk.js.map",
+    "index.html": "/regraph-demo/index.html",
+    "precache-manifest.f2d90d1209e2041ecde56e22d0b25639.js": "/regraph-demo/precache-manifest.f2d90d1209e2041ecde56e22d0b25639.js",
+    "service-worker.js": "/regraph-demo/service-worker.js",
+    "static/css/2.74e1a1f8.chunk.css.map": "/regraph-demo/static/css/2.74e1a1f8.chunk.css.map",
+    "static/css/main.7a338e7c.chunk.css.map": "/regraph-demo/static/css/main.7a338e7c.chunk.css.map",
+    "static/js/2.aaf2f18a.chunk.js.LICENSE.txt": "/regraph-demo/static/js/2.aaf2f18a.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.499d57d8.js",
+    "static/css/2.74e1a1f8.chunk.css",
+    "static/js/2.aaf2f18a.chunk.js",
+    "static/css/main.7a338e7c.chunk.css",
+    "static/js/main.c4b3814f.chunk.js"
+  ]
+}
