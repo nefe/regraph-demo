@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "772271149a1fbe1bbb6eda94cc58109c",
+    "revision": "be532ac5cf1fe22fdab8c8c261e6b22f",
     "url": "/regraph-demo/index.html"
   },
   {
@@ -8,8 +8,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/regraph-demo/static/css/2.74e1a1f8.chunk.css"
   },
   {
-    "revision": "5a5148c57c84998d52e3",
-    "url": "/regraph-demo/static/css/main.7a338e7c.chunk.css"
+    "revision": "afce023ec3a481122546",
+    "url": "/regraph-demo/static/css/main.cc5e652f.chunk.css"
   },
   {
     "revision": "1f86b1331e935ebe8b9a",
@@ -20,8 +20,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/regraph-demo/static/js/2.aaf2f18a.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "5a5148c57c84998d52e3",
-    "url": "/regraph-demo/static/js/main.c4b3814f.chunk.js"
+    "revision": "afce023ec3a481122546",
+    "url": "/regraph-demo/static/js/main.83631afc.chunk.js"
   },
   {
     "revision": "282a42ce0f2aae637615",
