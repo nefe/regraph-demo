@@ -1,25 +1,25 @@
 /**
- * @file å¬å±ç±»åå®ä¹æä»¶
+ * @file 公共类型定义文件
  * @author perkinJ
  */
 
-// è¿æ¥ç¬¦
+// 连接符
 export const CONNECTOR = '_';
 
-// ç¹åæ 
+// 点坐标
 export class Point {
   x: number;
 
   y: number;
 }
 
-// èç¹æ¯æçå½¢ç¶
+// 节点支持的形状
 export type Shape = 'rect' | 'circle' | 'ellipse' | 'poly';
 
-// æ¹å
+// 方向
 export type Direction = 'left' | 'right';
 
-// åéå¨èç¹å±æ§
+// 圈选器节点属性
 export class ShapeProps {
   x: number;
 
@@ -32,17 +32,17 @@ export class ShapeProps {
   direction: Direction;
 }
 
-// éç¨svgåç´ æ ·å¼
+// 通用svg元素样式
 export class StyleProps {
-  /** å¡«åè² */
+  /** 填充色 */
   fill?: string;
 
-  /** è¾¹æ¡å®½åº¦ */
+  /** 边框宽度 */
   strokeWidth?: number;
 
-  /** é¢è² */
+  /** 颜色 */
   stroke?: string;
 
-  /** èçº¿é´é */
+  /** 虚线间隔 */
   strokeDasharray?: string;
 }

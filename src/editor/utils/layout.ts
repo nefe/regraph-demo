@@ -1,5 +1,5 @@
 /**
- * @file å¸å±ç¸å³æ¹æ³
+ * @file 布局相关方法
  * @author perkinJ
  */
 
@@ -12,10 +12,10 @@ export class Point {
 export type Relation = 'on' | 'in' | 'out';
 
 /**
- * @description å°çº¿æ³å¤æ­ç¹æ¯å¦å¨å¤è¾¹å½¢åé¨
- * @param {Object} p å¾å¤æ­çç¹ï¼æ ¼å¼ï¼{ x: Xåæ , y: Yåæ  }
- * @param {Array} poly å¤è¾¹å½¢é¡¶ç¹ï¼æ°ç»æåçæ ¼å¼å p
- * @return {Relation} ç¹på¨å¤è¾¹å½¢çå³ç³»ï¼åå«ä¸ºon,in,out
+ * @description 射线法判断点是否在多边形内部
+ * @param {Object} p 待判断的点，格式：{ x: X坐标, y: Y坐标 }
+ * @param {Array} poly 多边形顶点，数组成员的格式同 p
+ * @return {Relation} 点p在多边形的关系，分别为on,in,out
  */
 
 export function pointInPoly(p: Point, poly: Point[]): Relation {
@@ -29,28 +29,28 @@ export function pointInPoly(p: Point, poly: Point[]): Relation {
     const tx = poly[j].x;
     const ty = poly[j].y;
 
-    // ç¹ä¸å¤è¾¹å½¢é¡¶ç¹éå
+    // 点与多边形顶点重合
     if ((sx === px && sy === py) || (tx === px && ty === py)) {
       return 'on';
     }
 
-    // å¤æ­çº¿æ®µä¸¤ç«¯ç¹æ¯å¦å¨å°çº¿ä¸¤ä¾§
+    // 判断线段两端点是否在射线两侧
     if ((sy < py && ty >= py) || (sy >= py && ty < py)) {
-      // çº¿æ®µä¸ä¸å°çº¿ Y åæ ç¸åçç¹ç X åæ 
+      // 线段上与射线 Y 坐标相同的点的 X 坐标
       const x = sx + ((py - sy) * (tx - sx)) / (ty - sy);
 
-      // ç¹å¨å¤è¾¹å½¢çè¾¹ä¸
+      // 点在多边形的边上
       if (x === px) {
         return 'on';
       }
 
-      // å°çº¿ç©¿è¿å¤è¾¹å½¢çè¾¹ç
+      // 射线穿过多边形的边界
       if (x > px) {
         flag = !flag;
       }
     }
   }
 
-  // å°çº¿ç©¿è¿å¤è¾¹å½¢è¾¹ççæ¬¡æ°ä¸ºå¥æ°æ¶ç¹å¨å¤è¾¹å½¢å
+  // 射线穿过多边形边界的次数为奇数时点在多边形内
   return flag ? 'in' : 'out';
 }

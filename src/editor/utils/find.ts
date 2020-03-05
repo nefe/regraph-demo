@@ -1,5 +1,5 @@
 /**
- * @file èç¹ï¼è¾¹æç´¢æ¹æ³
+ * @file 节点，边搜索方法
  * @author perkinJ
  */
 
@@ -8,7 +8,7 @@ import { Node, Link } from '../defines';
 import { distance } from './calc';
 import { Point } from './types';
 /**
- * æ¥æ¾åä¸ªä¸æ¸¸ç»ä»¶
+ * 查找单个上游组件
  */
 export const findUpstreamNode = (id: string, nodes: Node[], links: Link[]) => {
   const selectedLinks = _.find(links, item => item.target === id);
@@ -19,7 +19,7 @@ export const findUpstreamNode = (id: string, nodes: Node[], links: Link[]) => {
 };
 
 /**
- * æ¥æ¾åä¸ªä¸æ¸¸ç»ä»¶
+ * 查找单个下游组件
  */
 export const findDownstreamNode = (id: string, nodes: Node[], links: Link[]) => {
   const selectedLinks = _.find(links, item => item.source === id);
@@ -29,7 +29,7 @@ export const findDownstreamNode = (id: string, nodes: Node[], links: Link[]) => 
   }
 };
 
-/** æç´¢å½åç»ä»¶çææçä¸æ¸¸ç»ä»¶ */
+/** 搜索当前组件的所有的下游组件 */
 export const findAllDownstreamNodes = (id: string, nodes: Node[], links: Link[]) => {
   const selectedLinks = _.filter(links, item => item.source === id);
   if (Array.isArray(selectedLinks) && selectedLinks.length > 0) {
@@ -39,7 +39,7 @@ export const findAllDownstreamNodes = (id: string, nodes: Node[], links: Link[])
   return [];
 };
 
-/** æç´¢ææçä¸æ¸¸ç»ä»¶ */
+/** 搜索所有的上游组件 */
 export const findAllUpstreamNodes = (id: string, nodes: Node[], links: Link[]) => {
   const selectedLinks = _.filter(links, item => item.target === id);
   if (selectedLinks) {
@@ -49,23 +49,23 @@ export const findAllUpstreamNodes = (id: string, nodes: Node[], links: Link[]) =
   return [];
 };
 
-/** æç´¢å½åç»ä»¶çææä¸æ¸¸è¿çº¿ */
+/** 搜索当前组件的所有上游连线 */
 export const findAllUptreamLinks = (id: string, links: Link[]) => {
   const newLinks = _.filter(links, item => item.target === id);
   return newLinks;
 };
 
-/** æç´¢å½åç»ä»¶çææä¸æ¸¸è¿çº¿ */
+/** 搜索当前组件的所有下游连线 */
 export const findAllDownstreamLinks = (id: string, links: Link[]) => {
   const newLinks = _.filter(links, item => item.source === id);
   return newLinks;
 };
 
 /**
- * @desc æ¥æ¾é è¿æä¸ªç¹æè¿çèç¹ï¼ç¨äºè¿çº¿
- * @param point ç¹çåæ 
- * @param nodes èç¹
- * @param range æå¤§èå´
+ * @desc 查找靠近某个点最近的节点，用于连线
+ * @param point 点的坐标
+ * @param nodes 节点
+ * @param range 最大范围
  */
 export const findNearbyNode = (point: Point, nodes: Node[], range: number) => {
   let targetNode: Node = null;
@@ -73,7 +73,7 @@ export const findNearbyNode = (point: Point, nodes: Node[], range: number) => {
   let targetPos = '';
 
   nodes.forEach(v => {
-    // 1. æ¯è¾4ä¸ªç¹ç¦»åå§ç¹æè¿çç¹
+    // 1. 比较4个点离初始点最近的点
     let minDistance = Infinity;
     ['left', 'right', 'top', 'bottom'].forEach(item => {
       let targetX;

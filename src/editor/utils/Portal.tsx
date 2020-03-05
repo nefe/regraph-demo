@@ -1,5 +1,5 @@
 /**
- * @file ä½¿ç¨hooksæ¨¡æReact.Portal
+ * @file 使用hooks模拟React.Portal
  * @author perkinJ
  * @link https://www.jayfreestone.com/writing/react-portals-with-hooks/
  */
@@ -71,7 +71,7 @@ interface PortalProps {
   id: string;
   children: React.ReactNode;
 }
-// å°è£Portalç»ä»¶
+// 封装Portal组件
 export default function Portal({ id, children }: PortalProps) {
   const target = usePortal(id);
 

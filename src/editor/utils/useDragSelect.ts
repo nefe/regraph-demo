@@ -1,5 +1,5 @@
 /**
- * @file åéå¨é»è¾å¤çï¼ä¸è§å¾åç¦»
+ * @file 圈选器逻辑处理，与视图分离
  * @author perkinJ
  */
 
@@ -23,7 +23,7 @@ export default function useDragSelect(dragSelectContainerRef: any, shape: Shape)
 
   const [pathData, setPathData] = useState('');
 
-  // è®°å½mousedownäºä»¶çX,Yä½ç½®ï¼
+  // 记录mousedown事件的X,Y位置，
   const mousdownX = useRef(0);
   const mousdownY = useRef(0);
 
@@ -55,10 +55,10 @@ export default function useDragSelect(dragSelectContainerRef: any, shape: Shape)
     event => {
       event.stopPropagation();
 
-      // æ¸ç©ºè·¯å¾
+      // 清空路径
       setPathData('');
 
-      // æ¸ç©ºåæ¬¡ç¹å»æ°æ®
+      // 清空初次点击数据
       mousdownX.current = 0;
       mousdownY.current = 0;
       dragSelectContainerRef.current.removeEventListener('mousemove', handleMouseMove);
@@ -87,7 +87,7 @@ export default function useDragSelect(dragSelectContainerRef: any, shape: Shape)
     };
   }, [dragSelectContainerRef, handleMouseDown]);
 
-  // è¿åéæ©å¨åæ ä½ç½®ä»¥åçæçpathæ°æ®
+  // 返回选择器坐标位置以及生成的path数据
   return { shapeProps, pathData };
 }
 

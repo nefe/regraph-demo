@@ -1,12 +1,12 @@
 /**
- * @file ç»å¸åºå±ä½ç½®è®¡ç®ç¸å³æ¹æ³
- * @author perkinJ
+ * @file 画布底层位置计算相关方法
+ * @author 剑决(perkin.pj)
  */
 
 import * as _ from 'lodash';
 import { Point, Shape, ShapeProps } from './types';
 /**
- * ä¸¤ç¹é´ç´çº¿è·ç¦»
+ * 两点间直线距离
  * @param sourcePoint
  * @param targetPoint
  */
@@ -17,12 +17,16 @@ export function distance(sourcePoint: Point, targetPoint: Point) {
 }
 
 /**
- * ä¸¤ç¹é´æ²çº¿
+ * 两点间曲线
  * @param sourcePoint
  * @param targetPoint
  */
 export const quadratic = (sourcePoint: Point, targetPoint: Point): string => {
-  const centerX = (sourcePoint.x + targetPoint.x) / 2;
+  const ratio = detectZoom();
+  const sourceX = sourcePoint.x * ratio;
+  const targetX = targetPoint.x * ratio;
+
+  const centerX = (sourceX + targetX) / 2;
   const centerY = (sourcePoint.y + targetPoint.y) / 2;
   let tolerance = 30;
 
@@ -34,24 +38,91 @@ export const quadratic = (sourcePoint: Point, targetPoint: Point): string => {
 
   return [
     'M',
-    sourcePoint.x,
+    sourceX,
     sourcePoint.y,
     'Q',
-    /** æ¨ªåä¸ç«åæåºå« */
-    sourcePoint.x + tolerance,
+    /** 横向与竖向有区别 */
+    sourceX + tolerance,
     sourcePoint.y,
     centerX,
     centerY,
     'T',
-    targetPoint.x - 6,
-    targetPoint.y - 2
+    targetX - 6,
+    targetPoint.y - 2,
   ].join(' ');
 };
 
 /**
- * è®¡ç®è¿çº¿çä½ç½®
- * @param node ä¸çº¿ç¸è¿çèç¹
+ * 计算屏幕缩放比例
  */
+export function detectZoom() {
+  let ratio = window.outerWidth / window.innerWidth;
+  const screen = window.screen;
+  const ua = navigator.userAgent.toLowerCase();
+
+  if (window.devicePixelRatio !== undefined) {
+    // 由于mac retina屏幕devicePixelRatio会扩大2倍，这里mac统一用window.outerWidth / window.innerWidth表示ratio
+    const isMac = /macintosh|mac os x/i.test(ua);
+
+    ratio = isMac ? window.outerWidth / window.innerWidth : window.devicePixelRatio;
+  } else if (ua.indexOf('msie') > -1) {
+    if ((screen as any).deviceXDPI && (screen as any).logicalXDPI) {
+      ratio = (screen as any).deviceXDPI / (screen as any).logicalXDPI;
+    }
+  } else if (window.outerWidth !== undefined && window.innerWidth !== undefined) {
+    ratio = window.outerWidth / window.innerWidth;
+  }
+
+  if (ratio) {
+    ratio = Math.round(ratio * 100) / 100;
+  }
+
+  return ratio;
+}
+
+/**
+ * 获取元素相对于页面的绝对位置
+ */
+export function getOffset(domNode: any, parentElem = window.document.body) {
+  let offsetTop = 0;
+  let offsetLeft = 0;
+  let targetDomNode = domNode;
+  const ratio = detectZoom();
+  while (targetDomNode !== parentElem && targetDomNode != null) {
+    offsetLeft += targetDomNode.offsetLeft;
+    offsetTop += targetDomNode.offsetTop;
+    targetDomNode = targetDomNode.offsetParent;
+  }
+  return {
+    offsetTop,
+    offsetLeft,
+  };
+}
+
+/** 获取元素在页面上占据的高度 */
+export function getHeight(dom: HTMLElement) {
+  if (!dom) {
+    return 0;
+  }
+  const style = window.getComputedStyle(dom);
+  return (
+    dom.getBoundingClientRect().height +
+    Number(style.marginTop.match(/\d+/g)) +
+    Number(style.marginBottom.match(/\d+/g))
+  );
+}
+
+// 获取元素在页面上占据的宽度
+export function getWidth(dom: HTMLElement) {
+  if (!dom) {
+    return 0;
+  }
+  const style = window.getComputedStyle(dom);
+  return (
+    dom.getBoundingClientRect().width + Number(style.marginLeft.match(/\d+/g)) + Number(style.marginRight.match(/\d+/g))
+  );
+}
+
 export function calcLinkPosition(node, position) {
   let x = node.x + node.width;
   let y = node.y + node.height / 2;
@@ -75,49 +146,7 @@ export function calcLinkPosition(node, position) {
   };
 }
 
-/**
- * è·ååç´ ç¸å¯¹äºé¡µé¢çç»å¯¹ä½ç½®
- */
-export function getOffset(domNode: any) {
-  let offsetTop = 0;
-  let offsetLeft = 0;
-  let targetDomNode = domNode;
-  while (targetDomNode !== window.document.body && targetDomNode != null) {
-    offsetLeft += targetDomNode.offsetLeft;
-    offsetTop += targetDomNode.offsetTop;
-    targetDomNode = targetDomNode.offsetParent;
-  }
-  return {
-    offsetTop,
-    offsetLeft
-  };
-}
-
-/** è·ååç´ å¨é¡µé¢ä¸å æ®çé«åº¦ */
-export function getHeight(dom: HTMLElement) {
-  if (!dom) {
-    return 0;
-  }
-  const style = window.getComputedStyle(dom);
-  return (
-    dom.getBoundingClientRect().height +
-    Number(style.marginTop.match(/\d+/g)) +
-    Number(style.marginBottom.match(/\d+/g))
-  );
-}
-
-// è·ååç´ å¨é¡µé¢ä¸å æ®çå®½åº¦
-export function getWidth(dom: HTMLElement) {
-  if (!dom) {
-    return 0;
-  }
-  const style = window.getComputedStyle(dom);
-  return (
-    dom.getBoundingClientRect().width + Number(style.marginLeft.match(/\d+/g)) + Number(style.marginRight.match(/\d+/g))
-  );
-}
-
-// å¤çä¸åå¾å½¢çpathæ°æ®
+// 处理不同图形的path数据
 export function handlePathData(shape: Shape, shapeProps: ShapeProps): string {
   const { x, y, width, height, direction } = shapeProps;
   let pathData = '';

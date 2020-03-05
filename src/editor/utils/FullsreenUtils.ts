@@ -1,10 +1,10 @@
 /**
- * @file å¨å±å·¥å·ç±»
+ * @file 全屏工具类
  * @author perkinJ
  */
 
 /**
- * å¨å±æä¸ä¸ªåç´ 
+ * 全屏某一个元素
  * @param element
  */
 function launchFullscreen(element: any) {
@@ -19,7 +19,7 @@ function launchFullscreen(element: any) {
   }
 }
 /**
- * éåºå¨å±
+ * 退出全屏
  */
 function exitFullscreen() {
   if (document.exitFullscreen) {
@@ -32,7 +32,7 @@ function exitFullscreen() {
 }
 
 /**
- * å¤æ­æ¯å¦å¤äºå¨å±ç¶æ
+ * 判断是否处于全屏状态
  */
 function isFull() {
   const doc = document as any;
