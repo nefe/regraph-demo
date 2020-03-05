@@ -688,9 +688,14 @@ export default class CanvasContent extends React.Component<
           needMinimap={true}
           needRefresh={true}
           zoomEnabled={false}
-          mapPosition="RB-IN"
-          mapWidth={320}
-          mapHeight={120}
+          mapPosition="RT-IN"
+          mapWidth={200}
+          mapHeight={300}
+          mapRectStyle={{
+            stroke: '#468CFF',
+            fill: 'transparent',
+            strokeWidth: 1.5
+          }}
           onScreenChange={this.getTransformInfo}
           onDragOver={event => {
             event.preventDefault();
