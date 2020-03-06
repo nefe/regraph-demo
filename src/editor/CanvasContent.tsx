@@ -52,6 +52,8 @@ class CanvasContentProps {
   deleteLinks: (selectedLinks: string[]) => void;
   copiedNodes: Node[];
   setCopiedNodes: (nodes: Node[]) => void;
+  currTrans: ZoomTransform;
+  setCurrTrans:(transform: ZoomTransform) => void;
 }
 
 class CanvasContentState {
@@ -93,10 +95,8 @@ export default class CanvasContent extends React.Component<
   CanvasContentProps,
   CanvasContentState
 > {
-  currTrans: ZoomTransform;
   nodesContainerRef: any;
   container: any;
-  handleApplyTransform: (transform: ZoomTransform) => void;
   screenWidth: number;
   screenHeight: number;
 
@@ -129,7 +129,7 @@ export default class CanvasContent extends React.Component<
     };
     this.nodesContainerRef = React.createRef();
     this.container = React.createRef();
-    this.currTrans = zoomIdentity;
+    // this.props.currTrans = zoomIdentity;
 
   }
 
@@ -205,7 +205,7 @@ export default class CanvasContent extends React.Component<
     const screenX = event.clientX - offsetLeft;
     const screenY = event.clientY - offsetTop;
 
-    const { k, x, y } = this.currTrans;
+    const { k, x, y } = this.props.currTrans;
 
     this.setState(preState => {
       const { dragLink } = preState;
@@ -293,7 +293,7 @@ export default class CanvasContent extends React.Component<
 
   /** 按下节点 */
   onDragNodeMouseDown = (node: Node, event: any) => {
-    const { k, x, y } = this.currTrans;
+    const { k, x, y } = this.props.currTrans;
 
     const { offsetTop, offsetLeft } = getOffset(this.container.current);
     const screenX = event.clientX - offsetLeft;
@@ -336,7 +336,7 @@ export default class CanvasContent extends React.Component<
     const screenX = event.clientX - offsetLeft;
     const screenY = event.clientY - offsetTop;
 
-    const { k, x, y } = this.currTrans;
+    const { k, x, y } = this.props.currTrans;
 
     const nearNode = findNearbyNode(
       {
@@ -376,7 +376,7 @@ export default class CanvasContent extends React.Component<
 
     const { setNodes, nodes } = this.props;
 
-    const { k, x, y } = this.currTrans;
+    const { k, x, y } = this.props.currTrans;
 
     const { offsetTop, offsetLeft } = getOffset(this.container.current);
     const screenX = event.clientX - offsetLeft;
@@ -436,11 +436,11 @@ export default class CanvasContent extends React.Component<
   };
 
   getTransformInfo = (currTrans: ZoomTransform) => {
-    this.currTrans = currTrans;
+    this.props.setCurrTrans(currTrans);
   };
 
   getScreenHandler = handleMap => {
-    this.handleApplyTransform = handleMap.handleApplyTransform;
+    // this.handleApplyTransform = handleMap.handleApplyTransform;
     this.handleResize = handleMap.handleResize;
     this.handleResizeTo = handleMap.handleResizeTo;
     this.handleAdapt = handleMap.handleAdapt;
@@ -456,7 +456,7 @@ export default class CanvasContent extends React.Component<
     const screenX = event.clientX - offsetLeft;
     const screenY = event.clientY - offsetTop;
 
-    const { k, x, y } = this.currTrans;
+    const { k, x, y } = this.props.currTrans;
 
     if (dragNode) {
       const { key, name, type, width, height } = dragNode;
@@ -659,7 +659,7 @@ export default class CanvasContent extends React.Component<
                 isSelected={isSelected}
                 showSelector={showSelector}
                 onResize={this.onResize.bind(this, child)}
-                currTrans={this.currTrans}
+                currTrans={this.props.currTrans}
                 onSelect={this.onSelectNode}
               />
             );
@@ -696,6 +696,7 @@ export default class CanvasContent extends React.Component<
             fill: 'transparent',
             strokeWidth: 1.5
           }}
+          focusEnabled={2}
           onScreenChange={this.getTransformInfo}
           onDragOver={event => {
             event.preventDefault();

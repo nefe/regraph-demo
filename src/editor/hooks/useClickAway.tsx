@@ -1,6 +1,6 @@
 import { MutableRefObject, useRef, useEffect, useCallback, useMemo } from 'react';
 
-// é¼ æ ç¹å»äºä»¶ï¼click ä¸ä¼çå¬å³é®
+// 鼠标点击事件，click 不会监听右键
 const defaultEvent = 'click';
 
 type RefType = HTMLElement | (() => HTMLElement | null) | null;

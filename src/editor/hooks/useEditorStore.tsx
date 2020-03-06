@@ -1,8 +1,8 @@
-import * as React from 'react';
-import * as _ from 'lodash';
-import { Node, Link } from '../defines';
-// import constate from 'constate';
-import { mockData } from '../mock';
+import * as React from "react";
+import * as _ from "lodash";
+import { Node, Link } from "../defines";
+import { ZoomTransform, zoomIdentity } from "d3-zoom";
+import { mockData } from "../mock";
 
 const { useState, useEffect } = React;
 
@@ -14,20 +14,21 @@ export function useEditorStore() {
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
   const [dragNode, setDragNode] = useState(null);
 
+  const [currTrans, setCurrTrans] = useState<ZoomTransform>(zoomIdentity);
+
   const [copiedNodes, setCopiedNodes] = useState<Node[]>([]);
 
   useEffect(() => {
     setEditorData(mockData);
 
-    const newNodes = _.get(mockData, 'steps').map(item => {
+    const newNodes = _.get(mockData, "steps").map(item => {
       return {
         ...item,
-        /** åå§åæ°æ®ï¼å¢å ref */
         ref: React.createRef()
       };
     });
     setNodes(newNodes);
-    setLinks(_.get(mockData, 'hops'));
+    setLinks(_.get(mockData, "hops"));
   }, []);
 
   const updateNodes = (node: Node) => {
@@ -58,6 +59,8 @@ export function useEditorStore() {
     dragNode,
     setDragNode,
     copiedNodes,
-    setCopiedNodes
+    setCopiedNodes,
+    currTrans,
+    setCurrTrans
   };
 }

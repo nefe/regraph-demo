@@ -22,13 +22,13 @@ const useResize = (isResize: boolean, { width, height, x, y }: NodeInfo): NodeIn
     const resizers = document.querySelectorAll('.resizer');
     const element = document.querySelector('.resizable');
     const minSize = 20;
-    // åå§é«åº¦å®½åº¦
+    // 初始高度宽度
     let originWidth = 0;
     let originHeight = 0;
-    // èç¹çåå§ä½ç½®
+    // 节点的初始位置
     let originX = 0;
     let originY = 0;
-    // é¼ æ ææ½çåå§ä½ç½®
+    // 鼠标拖拽的初始位置
     let originMouseX = 0;
     let originMouseY = 0;
     if (isResize) {
@@ -52,7 +52,7 @@ const useResize = (isResize: boolean, { width, height, x, y }: NodeInfo): NodeIn
           originMouseX = (e as any).pageX;
           originMouseY = (e as any).pageY;
 
-          // åæ´type
+          // 变更type
           window.addEventListener('mousemove', resize);
           window.addEventListener('mouseup', stopResize);
         });

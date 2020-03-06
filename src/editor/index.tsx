@@ -1,16 +1,20 @@
-import * as React from 'react';
-import * as _ from 'lodash';
-import * as uuid from 'uuid';
-import { Toolbar, NodePanel } from './components';
-import CanvasContent from './CanvasContent';
-import { useEditorStore } from './hooks/useEditorStore';
-import { useKeyPress } from './hooks/useKeyPress';
-import './index.scss';
+import * as React from "react";
+import * as _ from "lodash";
+import * as uuid from "uuid";
+import { Toolbar, NodePanel, DragSelector } from "./components";
+import CanvasContent from "./CanvasContent";
+import { useEditorStore } from "./hooks/useEditorStore";
+import { useKeyPress } from "./hooks/useKeyPress";
+import { ShapeProps } from "./utils/useDragSelect";
+import { pointInPoly } from "./utils/layout";
+
+import "./index.scss";
 
 const { useState, useRef, useEffect } = React;
 
 export default function EditorDemo(props) {
   const [screenScale, changeScreenScale] = useState(100);
+  const [dragSelectable, setDragSelectable] = useState(false);
   const {
     nodes,
     links,
@@ -25,7 +29,9 @@ export default function EditorDemo(props) {
     updateNodes,
     updateLinks,
     copiedNodes,
-    setCopiedNodes
+    setCopiedNodes,
+    currTrans,
+    setCurrTrans
   } = useEditorStore();
 
   // 画布容器
@@ -37,6 +43,9 @@ export default function EditorDemo(props) {
   } as any);
 
   const canvasInstance = canvasRef.current;
+
+  // 更新画布容器的高度
+  const canvasContainer = document.querySelector(".editor-canvas");
 
   /** 删除组件 */
   const handleDeleteNodes = (ids: string[]) => {
@@ -71,7 +80,9 @@ export default function EditorDemo(props) {
     }
     const linkList = links.map(link => link.id);
     const diffLinks = _.difference(linkList, activeLinks);
-    const newLinks = diffLinks ? diffLinks.map(link => _.find(links, item => item.id === link)) : [];
+    const newLinks = diffLinks
+      ? diffLinks.map(link => _.find(links, item => item.id === link))
+      : [];
     setLinks(newLinks);
   };
 
@@ -133,31 +144,84 @@ export default function EditorDemo(props) {
     }
   };
 
+  // 圈选
+  const handleDragSelect = () => {
+    setDragSelectable(!dragSelectable);
+  };
+
+  /** 处理DragSelector 关闭事件 */
+  const onDragSelectorClose = (selectorProps: ShapeProps) => {
+    // 计算区域内的位置有多少节点需要高亮,其实计算的是一个点是否在矩形内
+
+    // 1. 计算每个节点的中心
+    // 多边形的位置信息要与画布同步
+    const { k, x, y } = currTrans;
+
+    const points = nodes.map(node => {
+      return {
+        x: k * node.x + x + (node.width / 2) * k,
+        y: k * node.y + y + (node.height / 2) * k,
+        id: node.id
+      };
+    });
+
+    // 2. 多边形各个点转化为数组，暂时为矩形，后面考虑其他形状
+    let poly = [];
+    if (selectorProps.direction === "left") {
+      poly = [
+        { x: selectorProps.x, y: selectorProps.y },
+        { x: selectorProps.x + selectorProps.width, y: selectorProps.y },
+        {
+          x: selectorProps.x + selectorProps.width,
+          y: selectorProps.y + selectorProps.height
+        },
+        { x: selectorProps.x, y: selectorProps.y + selectorProps.height }
+      ];
+    } else {
+      poly = [
+        { x: selectorProps.x, y: selectorProps.y },
+        { x: selectorProps.x - selectorProps.width, y: selectorProps.y },
+        {
+          x: selectorProps.x - selectorProps.width,
+          y: selectorProps.y - selectorProps.height
+        },
+        { x: selectorProps.x, y: selectorProps.y - selectorProps.height }
+      ];
+    }
+
+    // 3. 射线法判断点是否在多边形的内部
+    const ids = points.map(point => {
+      if (pointInPoly(point, poly) === "in") {
+        return point.id;
+      }
+    });
+    setSelectedNodes(ids);
+    setDragSelectable(false);
+  };
+
   useKeyPress(
-    'delete',
+    "delete",
     () => {
       handleDelete();
     },
     {
-      events: ['keydown', 'keyup']
+      events: ["keydown", "keyup"]
     }
   );
 
-  const isMac = navigator.platform.startsWith('Mac');
+  const isMac = navigator.platform.startsWith("Mac");
 
-  useKeyPress(isMac ? ['meta.x'] : ['ctrl.x'], () => {
+  useKeyPress(isMac ? ["meta.x"] : ["ctrl.x"], () => {
     handleShear();
   });
 
-  useKeyPress(isMac ? ['meta.c'] : ['ctrl.c'], () => {
+  useKeyPress(isMac ? ["meta.c"] : ["ctrl.c"], () => {
     handleCopy();
   });
 
-  useKeyPress(isMac ? ['meta.v'] : ['ctrl.v'], () => {
+  useKeyPress(isMac ? ["meta.v"] : ["ctrl.v"], () => {
     handlePaste();
   });
-
-  
 
   /** 操作区 */
   const renderOperation = (
@@ -167,12 +231,24 @@ export default function EditorDemo(props) {
         screenScale={screenScale}
         changeScreenScale={changeScreenScale}
         handleResizeTo={canvasInstance && canvasInstance.handleResizeTo}
-        items={['fullscreen', 'zoom', 'adapt', 'format', 'ratio', 'shear', 'copy', 'paste', 'delete']}
+        items={[
+          "fullscreen",
+          "zoom",
+          "adapt",
+          "format",
+          "ratio",
+          "shear",
+          "copy",
+          "paste",
+          "delete",
+          "dragSelect"
+        ]}
         layout={canvasInstance && canvasInstance.layout}
         onCopy={handleCopy}
         onPaste={handlePaste}
         onDelete={handleDelete}
         onShear={handleShear}
+        onDragSelect={handleDragSelect}
       />
     </div>
   );
@@ -186,6 +262,18 @@ export default function EditorDemo(props) {
   /** 渲染中间画布区 */
   const renderCanvas = (
     <div className="editor-canvas">
+      <DragSelector
+        visible={dragSelectable}
+        getPopupContainer={() => document.querySelector(".editor-canvas")}
+        overlayColor={"rgba(0,0,0,0.1)"}
+        selectorStyle={{
+          fill: "transparent",
+          strokeWidth: 1,
+          stroke: "#6ca0f5",
+          strokeDasharray: "5 5"
+        }}
+        onClose={onDragSelectorClose}
+      />
       <CanvasContent
         dragNode={dragNode}
         ref={canvasRef}
@@ -203,6 +291,8 @@ export default function EditorDemo(props) {
         deleteLinks={handleDeleteLinks}
         copiedNodes={copiedNodes}
         setCopiedNodes={setCopiedNodes}
+        currTrans={currTrans}
+        setCurrTrans={setCurrTrans}
       />
     </div>
   );

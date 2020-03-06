@@ -11,7 +11,7 @@ export type EventOption = {
   target?: Window | RefType;
 };
 
-// é®çäºä»¶ keyCode å«å
+// 键盘事件 keyCode 别名
 const aliasKeyCodeMap: any = {
   esc: 27,
   tab: 9,
@@ -24,7 +24,7 @@ const aliasKeyCodeMap: any = {
   delete: [8, 46]
 };
 
-// é®çäºä»¶ key å«å
+// 键盘事件 key 别名
 const aliasKeyMap: any = {
   esc: 'Escape',
   tab: 'Tab',
@@ -38,7 +38,7 @@ const aliasKeyMap: any = {
   delete: ['Backspace', 'Delete']
 };
 
-// ä¿®é¥°é®
+// 修饰键
 const modifierKey: any = {
   ctrl: (event: KeyboardEvent) => event.ctrlKey,
   shift: (event: KeyboardEvent) => event.shiftKey,
@@ -46,12 +46,12 @@ const modifierKey: any = {
   meta: (event: KeyboardEvent) => event.metaKey
 };
 
-// è¿åç©ºå¯¹è±¡
+// 返回空对象
 const noop = () => {};
 
 /**
- * å¤æ­å¯¹è±¡ç±»å
- * @param [obj: any] åæ°å¯¹è±¡
+ * 判断对象类型
+ * @param [obj: any] 参数对象
  * @returns String
  */
 function isType(obj: any) {
@@ -62,33 +62,33 @@ function isType(obj: any) {
 }
 
 /**
- * å¤æ­æé®æ¯å¦æ¿æ´»
- * @param [event: KeyboardEvent]é®çäºä»¶
- * @param [keyFilter: any] å½åé®
+ * 判断按键是否激活
+ * @param [event: KeyboardEvent]键盘事件
+ * @param [keyFilter: any] 当前键
  * @returns Boolean
  */
 function genFilterKey(event: any, keyFilter: any) {
   const type = isType(keyFilter);
-  // æ°å­ç±»åç´æ¥å¹éäºä»¶ç keyCode
+  // 数字类型直接匹配事件的 keyCode
   if (type === 'number') {
     return event.keyCode === keyFilter;
   }
-  // å­ç¬¦ä¸²ä¾æ¬¡å¤æ­æ¯å¦æç»åé®
+  // 字符串依次判断是否有组合键
   const genArr = keyFilter.split('.');
   let genLen = 0;
   for (const key of genArr) {
-    // ç»åé®
+    // 组合键
     const genModifier = modifierKey[key];
-    // key å«å
+    // key 别名
     const aliasKey = aliasKeyMap[key];
-    // keyCode å«å
+    // keyCode 别名
     const aliasKeyCode = aliasKeyCodeMap[key];
     /**
-     * æ»¡è¶³ä»¥ä¸è§å
-     * 1. èªå®ä¹ç»åé®å«å
-     * 2. èªå®ä¹ key å«å
-     * 3. èªå®ä¹ keyCode å«å
-     * 4. å¹é key æ keyCode
+     * 满足以上规则
+     * 1. 自定义组合键别名
+     * 2. 自定义 key 别名
+     * 3. 自定义 keyCode 别名
+     * 4. 匹配 key 或 keyCode
      */
     if (
       (genModifier && genModifier(event)) ||
@@ -105,8 +105,8 @@ function genFilterKey(event: any, keyFilter: any) {
 }
 
 /**
- * é®çè¾å¥é¢å¤çæ¹æ³
- * @param [keyFilter: any] å½åé®
+ * 键盘输入预处理方法
+ * @param [keyFilter: any] 当前键
  * @returns () => Boolean
  */
 function genKeyFormater(keyFilter: any): KeyPredicate {
