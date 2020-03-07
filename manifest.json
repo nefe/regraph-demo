@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "ReGraph Demo",
+  "name": "Demo Based ReGraph",
   "icons": [
     {
       "src": "favicon.ico",
