@@ -4,8 +4,7 @@ import * as uuid from "uuid";
 import { BaseLayout } from "regraph-next";
 import { Toolbar, NodePanel, DragSelector } from "./components";
 import CanvasContent from "./CanvasContent";
-import { useEditorStore } from "./hooks/useEditorStore";
-import { useKeyPress } from "./hooks/useKeyPress";
+import { useEditorStore, useKeyPress, useEventListener } from "./hooks";
 import { ShapeProps } from "./utils/useDragSelect";
 import { pointInPoly } from "./utils/layout";
 
@@ -16,6 +15,7 @@ const { useState, useRef, useEffect } = React;
 export default function EditorDemo(props) {
   const [screenScale, changeScreenScale] = useState(100);
   const [dragSelectable, setDragSelectable] = useState(false);
+  const [keyPressing, setKeyPressing] = useState(false);
   const {
     nodes,
     links,
@@ -97,6 +97,7 @@ export default function EditorDemo(props) {
   /** 粘贴节点 */
   const handleNodesPaste = () => {
     if (copiedNodes) {
+      console.log('copiedNodes',copiedNodes)
       const currentCopied = copiedNodes.map(node => {
         return {
           ...node,
@@ -122,7 +123,7 @@ export default function EditorDemo(props) {
   // 复制
   const handleCopy = () => {
     if (selectedNodes) {
-      handleNodesCopy(selectedNodes);
+      handleNodesCopy(_.compact(selectedNodes));
     }
   };
 
@@ -232,6 +233,17 @@ export default function EditorDemo(props) {
     handlePaste();
   });
 
+  useEventListener("keydown", (event:KeyboardEvent) => {
+    const SUPER_KEY_CODE = navigator.platform.startsWith('Mac') ? event.metaKey : event.ctrlKey;
+    if(SUPER_KEY_CODE) {
+      setKeyPressing(true)
+    }
+  }, canvasInstance);
+
+  useEventListener("keyup", (event:KeyboardEvent) => {
+    setKeyPressing(false)
+  }, canvasInstance);
+
   /** 操作区 */
   const renderOperation = (
     <div>
@@ -307,6 +319,7 @@ export default function EditorDemo(props) {
         setCopiedNodes={setCopiedNodes}
         currTrans={currTrans}
         setCurrTrans={setCurrTrans}
+        isKeyPressing={keyPressing}
       />
     </div>
   );

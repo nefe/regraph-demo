@@ -52,6 +52,8 @@ class CanvasContentProps {
   setCopiedNodes: (nodes: Node[]) => void;
   currTrans: ZoomTransform;
   setCurrTrans: (transform: ZoomTransform) => void;
+  /** 是否被按住 */
+  isKeyPressing: boolean;
 }
 
 class CanvasContentState {
@@ -82,7 +84,6 @@ class CanvasContentState {
   menuPos: MenuPos;
   /** 画布的放大倍率 */
   screenScale: number;
-  isKeyPressing: boolean;
   /** 当前鼠标悬浮的节点 */
   currentHoverNode: string;
   /** 删除框 */
@@ -108,7 +109,6 @@ export default class CanvasContent extends React.Component<
     this.state = {
       isDraggingNode: false,
       isDraggingLink: false,
-      isKeyPressing: false,
       dragNode: null,
       dragLink: null,
       dragNodeOffset: null,
@@ -647,13 +647,14 @@ export default class CanvasContent extends React.Component<
 
   /** 点击节点 */
   onClickNode = (currentNode: Node) => {
-    const { selectedNodes, setSelectedNodes } = this.props;
-    const { isKeyPressing } = this.state;
+    const { selectedNodes, setSelectedNodes,setSelectedLinks,isKeyPressing } = this.props;
+
     // 区分多选按钮是否按下
     if (isKeyPressing) {
       if (selectedNodes) {
         // 若节点已被点击则清除点击状态
         const index = _.findIndex(selectedNodes, id => id === currentNode.id);
+
         if (index > -1) {
           setSelectedNodes([
             ...selectedNodes.slice(0, index),
@@ -666,9 +667,9 @@ export default class CanvasContent extends React.Component<
         setSelectedNodes([currentNode.id]);
       }
     } else {
-      this.props.setSelectedNodes([currentNode.id]);
+      setSelectedNodes([currentNode.id]);
       // 清空高亮的连线
-      this.props.setSelectedLinks(null);
+      setSelectedLinks(null);
     }
   };
 

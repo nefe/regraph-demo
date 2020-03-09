@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback } from "react";
 
 // Initial state that we pass into useReducer
 const initialState = {
@@ -14,7 +14,7 @@ const initialState = {
 const reducer = (state, action) => {
   const { past, present, future } = state;
   switch (action.type) {
-    case 'UNDO':
+    case "UNDO":
       const previous = past[past.length - 1];
       const newPast = past.slice(0, past.length - 1);
 
@@ -23,7 +23,7 @@ const reducer = (state, action) => {
         present: previous,
         future: [present, ...future]
       };
-    case 'REDO':
+    case "REDO":
       const next = future[0];
       const newFuture = future.slice(1);
 
@@ -32,7 +32,7 @@ const reducer = (state, action) => {
         present: next,
         future: newFuture
       };
-    case 'SET':
+    case "SET":
       const { newPresent } = action;
 
       if (newPresent === present) {
@@ -43,7 +43,7 @@ const reducer = (state, action) => {
         present: newPresent,
         future: []
       };
-    case 'CLEAR':
+    case "CLEAR":
       const { initialPresent } = action;
 
       return {
@@ -65,29 +65,23 @@ const useHistory = initialPresent => {
   // Setup our callback functions
   // We memoize with useCallback to prevent unecessary re-renders
 
-  const undo = useCallback(
-    () => {
-      if (canUndo) {
-        dispatch({ type: 'UNDO' });
-      }
-    },
-    [canUndo, dispatch]
-  );
+  const undo = useCallback(() => {
+    if (canUndo) {
+      dispatch({ type: "UNDO" });
+    }
+  }, [canUndo, dispatch]);
 
-  const redo = useCallback(
-    () => {
-      if (canRedo) {
-        dispatch({ type: 'REDO' });
-      }
-    },
-    [canRedo, dispatch]
-  );
+  const redo = useCallback(() => {
+    if (canRedo) {
+      dispatch({ type: "REDO" });
+    }
+  }, [canRedo, dispatch]);
 
-  const set = useCallback(newPresent => dispatch({ type: 'SET', newPresent }), [
+  const set = useCallback(newPresent => dispatch({ type: "SET", newPresent }), [
     dispatch
   ]);
 
-  const clear = useCallback(() => dispatch({ type: 'CLEAR', initialPresent }), [
+  const clear = useCallback(() => dispatch({ type: "CLEAR", initialPresent }), [
     dispatch
   ]);
 
@@ -95,4 +89,4 @@ const useHistory = initialPresent => {
   return { state: state.present, set, undo, redo, clear, canUndo, canRedo };
 };
 
-export default useHistory;
+export { useHistory };

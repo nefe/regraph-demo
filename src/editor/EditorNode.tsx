@@ -80,7 +80,6 @@ export function EditorNode(props: EditorNodeProps) {
   const {
     currentNode,
     onSelect,
-    hasError,
     isSelected,
     isDragged,
     onClick,
