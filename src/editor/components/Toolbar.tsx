@@ -27,7 +27,8 @@ export type ToolbarType =
   | "copy"
   | "paste"
   | "delete"
-  | "dragSelect";
+  | "dragSelect"
+  | "layout";
 
 export class ToolbarProps {
   /** 适应画布 */
@@ -57,6 +58,8 @@ export class ToolbarProps {
 
   onDragSelect?: () => void;
 
+  onLayout?: () => void;
+
   /** 处理全屏 */
   // handleFullScreen?: () => void;
   /** Toolbar选项 */
@@ -76,7 +79,8 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
     onPaste,
     onDelete,
     onDragSelect,
-    onSave
+    onSave,
+    onLayout
   } = props;
   const scale = String(Math.round(screenScale));
 
@@ -106,6 +110,8 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
   const isDelete = items.includes("delete");
 
   const isDragSelect = items.includes("dragSelect");
+
+  const isLayout = items.includes("layout");
 
   /** 当前是否是全屏状态 */
 
@@ -219,7 +225,13 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
 
         {isDragSelect && (
           <div className="toolbar-btn">
-            <Icon type="border-outer" onClick={onDragSelect} />
+            <Icon type="gateway" onClick={onDragSelect} />
+          </div>
+        )}
+
+        {isLayout && (
+          <div className="toolbar-btn">
+            <Icon type="border-outer" onClick={onLayout} />
           </div>
         )}
       </>

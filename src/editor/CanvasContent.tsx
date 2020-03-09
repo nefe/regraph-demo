@@ -5,7 +5,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 import * as uuid from "uuid";
-import { ReScreen, Utils } from "regraph-next";
+import { ReScreen } from "regraph-next";
 import { ZoomTransform, zoomIdentity } from "d3-zoom";
 import { Menu } from "antd";
 import { EditorNode } from "./EditorNode";
@@ -31,8 +31,6 @@ import {
 } from "./utils/find";
 import { calcLinkPosition } from "./utils/calc";
 import { exitFullscreen, launchFullscreen, isFull, getOffset } from "../utils";
-
-const { Point } = Utils;
 
 class CanvasContentProps {
   ref: any;

@@ -48,12 +48,6 @@ export const LINK = "#b4bdcf";
 // 管道节点code为30，为固定值
 export const operatorTypeCode = 30;
 
-interface StatusItem {
-  key: string;
-  text: string;
-  icon: React.ReactNode;
-}
-
 // 组件库类型
 export enum ComponentType {
   /** 通用 */
@@ -215,49 +209,7 @@ const COMMON_COMPONENT: Node[] = [
     ),
     disabled: false
   },
-  /** TODO 菱形 */
-  // {
-  //   type: ComponentType.common,
-  //   key: ComponentKey.diamond,
-  //   name: "DIAMOND",
-  //   width: 100,
-  //   height: 100,
-  //   icon: (
-  //     <div className="diamond">
-        
-  //     </div>
-  //   ),
-  //   disabled: false
-  // }
-  /** 多边形 */
-  // {
-  //   type: ComponentType.common,
-  //   key: ComponentKey.polygon,
-  //   name: 'POLYGON',
-  //   icon: <Icon type="border" />,
-  //   width: 100,
-  //   height: 100,
-  //   disabled: true
-  // },
-  // /** 椭圆 */
-  // {
-  //   type: ComponentType.common,
-  //   key: ComponentKey.ellipse,
-  //   name: 'ELLIPSE',
-  //   icon: <Icon type="border" />,
-  //   width: 100,
-  //   height: 100,
-  //   disabled: true
-  // }
-];
-
-// const SELF_COMPONENT: Node[] = [
-//   {
-//     type: ComponentType.self,
-//     key: ComponentKey.star,
-//     name: 'STAR'
-//   }
-// ];
+]
 
 // 组件库类目
 export const COMPONENT_CATEGORY: Record<ComponentType, Node[]> = {
@@ -283,25 +235,6 @@ export function getContainer() {
 /**
  * @file 类型定义文件
  */
-class Vertex {
-  id: string;
-
-  x: number;
-
-  y: number;
-
-  width: number;
-
-  height: number;
-}
-
-class Edge {
-  u: string;
-
-  v: string;
-}
-
-type MenuType = "vertex" | "edge";
 class MenuPos {
   id?: string;
 
@@ -314,22 +247,10 @@ class MenuPos {
 export const VERTEX_WIDTH = 180;
 export const VERTEX_HEIGHT = 32;
 
-export { Vertex, Edge, MenuPos };
+export { MenuPos };
 
 // 操作类型
 export enum OperateType {
-  configuration = "configuration",
   copy = "copy",
   delete = "delete",
-  parallelism = "parallelism",
-  outputType = "outputType",
-  mainOutput = "mainOutput",
-  errorOutput = "errorOutput",
-  dataMethod = "dataMethod",
-  copyMethod = "copyMethod",
-  distribute = "distribute",
-  paste = "paste",
-  deleteLink = "deleteLink",
-  selectAll = "selectAll",
-  dragSelect = "dragSelect"
 }
