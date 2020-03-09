@@ -5,7 +5,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 import * as uuid from "uuid";
-import { ReScreen } from "regraph-next";
+import { ReScreen, BaseLayout } from "regraph-next";
 import { ZoomTransform, zoomIdentity } from "d3-zoom";
 import { Menu } from "antd";
 import { EditorNode } from "./EditorNode";
@@ -51,7 +51,7 @@ class CanvasContentProps {
   copiedNodes: Node[];
   setCopiedNodes: (nodes: Node[]) => void;
   currTrans: ZoomTransform;
-  setCurrTrans:(transform: ZoomTransform) => void;
+  setCurrTrans: (transform: ZoomTransform) => void;
 }
 
 class CanvasContentState {
@@ -98,9 +98,7 @@ export default class CanvasContent extends React.Component<
   screenWidth: number;
   screenHeight: number;
 
-  autoVerticalScroller: any = null;
-  autoHorizontalScroller: any = null;
-
+  handleApplyTransform: (transform: ZoomTransform) => void;
   handleResize: (isLarge: boolean) => void;
   handleAdapt: () => void;
   handleResizeTo: (scale: number, P0?: [number, number]) => void;
@@ -128,7 +126,6 @@ export default class CanvasContent extends React.Component<
     this.nodesContainerRef = React.createRef();
     this.container = React.createRef();
     // this.props.currTrans = zoomIdentity;
-
   }
 
   componentDidMount() {
@@ -438,7 +435,7 @@ export default class CanvasContent extends React.Component<
   };
 
   getScreenHandler = handleMap => {
-    // this.handleApplyTransform = handleMap.handleApplyTransform;
+    this.handleApplyTransform = handleMap.handleApplyTransform;
     this.handleResize = handleMap.handleResize;
     this.handleResizeTo = handleMap.handleResizeTo;
     this.handleAdapt = handleMap.handleAdapt;
@@ -474,7 +471,6 @@ export default class CanvasContent extends React.Component<
       setNodes([...nodes, newNode]);
     }
   }
-
 
   /** 清空高亮组件和连线 */
   handleClearActive = () => {
@@ -515,26 +511,120 @@ export default class CanvasContent extends React.Component<
     }
   };
 
-  renderDragSource() {
-    const dragSourceList = ["组件1", "组件2"];
+  /** 适应画布 */
+  handleShowAll = () => {
+    const { nodes } = this.props;
 
-    return (
-      <div className="flow-drag-source">
-        {dragSourceList.map((name, index) => {
-          return (
-            <div
-              className="flow-drag-source-item"
-              key={index}
-              draggable
-              onDrag={event => this.onDrag(event, name)}
-            >
-              {name}
-            </div>
-          );
-        })}
-      </div>
+    if (nodes && nodes.length === 0) {
+      return;
+    }
+
+    // 组件实际范围
+    const minX = _.minBy(nodes, c => c.x).x;
+    const maxX = _.maxBy(nodes, c => c.x)?.x + _.maxBy(nodes, c => c.x)?.width;
+    const minY = _.minBy(nodes, c => c.y).y;
+    const maxY = _.maxBy(nodes, c => c.y)?.y + _.maxBy(nodes, c => c.y)?.height;
+
+    const componentWidth = maxX - minX;
+    const componentHeight = maxY - minY;
+
+    // 先在不缩放的场景下，平移到画布中点
+    const x = this.screenWidth / 2 - (minX + maxX) / 2;
+    const y = this.screenHeight / 2 - (minY + maxY) / 2;
+    const transform = zoomIdentity.translate(x, y).scale(1);
+    // 适应画布最大100%，保证在节点少的情况下不发生放大
+    const scale = Math.min(
+      this.screenWidth / componentWidth,
+      this.screenHeight / componentHeight,
+      1
     );
-  }
+    // Todo 待收敛到 ReScreen
+    const P0 = [this.screenWidth / 2, this.screenHeight / 2] as [
+      number,
+      number
+    ];
+    const P1 = transform.invert(P0);
+    const newTransform = zoomIdentity
+      .translate(P0[0] - P1[0] * scale, P0[1] - P1[1] * scale)
+      .scale(scale);
+    this.handleApplyTransform(newTransform);
+  };
+
+  /** 格式化画布 */
+  layout = () => {
+    const { nodes, links, setNodes } = this.props;
+    if (nodes && nodes.length === 0) {
+      return {
+        nodes,
+        screen: {
+          k: 1,
+          x: 0,
+          y: 0
+        }
+      };
+    }
+
+    const datas = nodes.map(component => {
+      // 兼容 BaseLayout 数据结构
+      (component as any).nodeWidth = component.width;
+      (component as any).nodeHeight = component.height;
+      const downRelations = links
+        .filter(link => {
+          return link.target === component.id;
+        })
+        .map(link => {
+          return {
+            sourceId: link.source,
+            targetId: link.target
+          };
+        });
+      const upRelations = links
+        .filter(link => {
+          return link.source === component.id;
+        })
+        .map(link => {
+          return {
+            sourceId: link.source,
+            targetId: link.target
+          };
+        });
+      return {
+        id: component.id,
+        downRelations,
+        upRelations
+      };
+    });
+
+    const maxWidth = _.maxBy(nodes, item => item.width)?.width;
+    const maxHeight = _.maxBy(nodes, item => item.height)?.height;
+
+    const dag = new BaseLayout.DAG({
+      isTransverse: true,
+      padding: 20,
+      margin: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0
+      },
+      defaultNodeWidth: maxWidth,
+      defaultNodeHeight: maxHeight
+    });
+
+    const { nodes: newNodes } = dag.getMultiDAG(datas);
+
+    const layoutNodes = nodes.map(component => {
+      const node = _.find(newNodes, n => n.id === component.id);
+
+      return {
+        ...component,
+        x: node.view.x,
+        y: node.view.y
+      };
+    });
+    setNodes(layoutNodes);
+    // this.handleShowAll(layoutNodes);
+  };
 
   /** 点击连线 */
   onSelectLink = (key: string) => {
@@ -690,8 +780,8 @@ export default class CanvasContent extends React.Component<
           mapWidth={200}
           mapHeight={300}
           mapRectStyle={{
-            stroke: '#468CFF',
-            fill: 'transparent',
+            stroke: "#468CFF",
+            fill: "transparent",
             strokeWidth: 1.5
           }}
           focusEnabled={2}

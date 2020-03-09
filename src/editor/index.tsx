@@ -208,76 +208,6 @@ export default function EditorDemo(props) {
     }
   };
 
-   /** 格式化画布 */
-   const layout = () => {
-    if (nodes && nodes.length === 0) {
-      return {
-        nodes,
-        screen: {
-          k: 1,
-          x: 0,
-          y: 0,
-        },
-      };
-    }
-
-    const datas = nodes.map(component => {
-      const downRelations = links
-        .filter(link => {
-          return link.target === component.id;
-        })
-        .map(link => {
-          return {
-            sourceId: link.source,
-            targetId: link.target,
-          };
-        });
-      const upRelations = links
-        .filter(link => {
-          return link.source === component.id;
-        })
-        .map(link => {
-          return {
-            sourceId: link.source,
-            targetId: link.target,
-          };
-        });
-      return {
-        id: component.id,
-        downRelations,
-        upRelations,
-      };
-    });
-    
-
-    const dag = new BaseLayout.DAG({
-      isTransverse: true,
-      padding: 20,
-      margin: {
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-      },
-      // defaultNodeWidth: 200,
-      // defaultNodeHeight: 100,
-    });
-
-    const { nodes: newNodes } = dag.getMultiDAG(datas);
-
-    const layoutNodes = nodes.map(component => {
-      const node = _.find(newNodes, n => n.id === component.id);
-
-      return {
-        ...component,
-        x: node.view.x,
-        y: node.view.y,
-      };
-    });
-    setNodes(layoutNodes);
-    // this.handleShowAll(layoutNodes);
-  };
-
   useKeyPress(
     "delete",
     () => {
@@ -322,16 +252,17 @@ export default function EditorDemo(props) {
           "paste",
           "delete",
           "dragSelect",
-          "layout"
+          "layout",
+          "adapt"
         ]}
-        layout={canvasInstance && canvasInstance.layout}
         onCopy={handleCopy}
         onPaste={handlePaste}
         onDelete={handleDelete}
         onShear={handleShear}
         onDragSelect={handleDragSelect}
         onSave={handleSave}
-        onLayout={layout}
+        onLayout={canvasInstance && canvasInstance.layout}
+        onAdapt={canvasInstance && canvasInstance.handleShowAll}
       />
     </div>
   );

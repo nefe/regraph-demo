@@ -28,7 +28,8 @@ export type ToolbarType =
   | "paste"
   | "delete"
   | "dragSelect"
-  | "layout";
+  | "layout"
+  | "adapt";
 
 export class ToolbarProps {
   /** 适应画布 */
@@ -43,9 +44,6 @@ export class ToolbarProps {
   /** 缩放大小 */
   screenScale?: number;
 
-  /** 格式化布局 */
-  layout?: () => void;
-
   onSave?: () => void;
 
   onShear?: () => void;
@@ -59,6 +57,8 @@ export class ToolbarProps {
   onDragSelect?: () => void;
 
   onLayout?: () => void;
+
+  onAdapt?: () => void;
 
   /** 处理全屏 */
   // handleFullScreen?: () => void;
@@ -80,7 +80,8 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
     onDelete,
     onDragSelect,
     onSave,
-    onLayout
+    onLayout,
+    onAdapt
   } = props;
   const scale = String(Math.round(screenScale));
 
@@ -170,30 +171,6 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
           </div>
         )}
 
-        {/* {isAdapt && (
-          <div className="adapt">
-            <Tooltip placement="top" title={I18N.DAG.DAGScreen.adapt}>
-              <Icon
-                type="dpicon icon-adapt"
-                onClick={() => {
-                  props.handleShowAll();
-                }}
-              />
-            </Tooltip>
-          </div>
-        )}
-        {isFormat && (
-          <div className="format">
-            <Tooltip placement="top" title={I18N.PipelineCanvas.utils.format}>
-              <Icon
-                type="one-icon icon-geshihuabuju anticon-dpicon"
-                onClick={() => {
-                  props.layout();
-                }}
-              />
-            </Tooltip>
-          </div>
-        )} */}
         {isFullScreen && (
           <div className="toolbar-btn">
             <Icon type={fullScreenClassName} onClick={handleFullScreen} />
@@ -229,9 +206,15 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
           </div>
         )}
 
+        {isAdapt && (
+          <div className="toolbar-btn">
+            <Icon type="border-outer" onClick={onAdapt} />
+          </div>
+        )}
+
         {isLayout && (
           <div className="toolbar-btn">
-            <Icon type="border-outer" onClick={onLayout} />
+            <Icon type="layout" onClick={onLayout} />
           </div>
         )}
       </>
