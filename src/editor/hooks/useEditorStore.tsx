@@ -2,7 +2,7 @@ import * as React from "react";
 import * as _ from "lodash";
 import { Node, Link } from "../defines";
 import { ZoomTransform, zoomIdentity } from "d3-zoom";
-import { mockData } from "../mock";
+import { useLocalStorage } from "./useLocalStorage";
 
 const { useState, useEffect } = React;
 
@@ -12,6 +12,9 @@ export function useEditorStore() {
   const [links, setLinks] = useState<Link[]>([]);
   const [selectedLinks, setSelectedLinks] = useState<string[]>([]);
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
+  const [editorLocalData, setEditorLocalData] = useLocalStorage("editorData", {
+    id: "editorData-test"
+  });
   const [dragNode, setDragNode] = useState(null);
 
   const [currTrans, setCurrTrans] = useState<ZoomTransform>(zoomIdentity);
@@ -19,28 +22,46 @@ export function useEditorStore() {
   const [copiedNodes, setCopiedNodes] = useState<Node[]>([]);
 
   useEffect(() => {
-    setEditorData(mockData);
+    setEditorData(editorLocalData);
 
-    const newNodes = _.get(mockData, "steps").map(item => {
+    const newNodes = (editorLocalData?.nodes ?? []).map(item => {
       return {
         ...item,
         ref: React.createRef()
       };
     });
     setNodes(newNodes);
-    setLinks(_.get(mockData, "hops"));
-  }, []);
+    setLinks(editorLocalData?.links ?? []);
+  }, [editorLocalData]);
 
   const updateNodes = (node: Node) => {
-    const index = _.findIndex(nodes, item => item.id === node.id);
+    const index = nodes.findIndex(item => item.id === node.id);
 
-    setNodes([...nodes.slice(0, index), node, ...nodes.slice(index + 1)]);
+    const newNodes = [
+      ...nodes.slice(0, index),
+      node,
+      ...nodes.slice(index + 1)
+    ];
+
+    setNodes(newNodes);
   };
 
   const updateLinks = (link: Link) => {
-    const index = _.findIndex(links, item => item.id === link.id);
+    const index = links.findIndex(item => item.id === link.id);
+    const newLinks = [
+      ...links.slice(0, index),
+      link,
+      ...links.slice(index + 1)
+    ];
 
-    setLinks([...links.slice(0, index), link, ...links.slice(index + 1)]);
+    setLinks(newLinks);
+  };
+
+  const handleSaveData = async () => {
+    const newNodes = nodes ?? [];
+    newNodes.forEach(node => delete node.ref);
+    const result = await setEditorLocalData({ ...editorData, nodes: newNodes, links });
+    return result
   };
 
   return {
@@ -61,6 +82,9 @@ export function useEditorStore() {
     copiedNodes,
     setCopiedNodes,
     currTrans,
-    setCurrTrans
+    setCurrTrans,
+    editorLocalData,
+    setEditorLocalData,
+    handleSaveData
   };
 }

@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 import * as uuid from "uuid";
+import { notification } from "antd";
 import { Toolbar, NodePanel, DragSelector } from "./components";
 import CanvasContent from "./CanvasContent";
 import { useEditorStore } from "./hooks/useEditorStore";
@@ -31,7 +32,8 @@ export default function EditorDemo(props) {
     copiedNodes,
     setCopiedNodes,
     currTrans,
-    setCurrTrans
+    setCurrTrans,
+    handleSaveData
   } = useEditorStore();
 
   // 画布容器
@@ -43,9 +45,6 @@ export default function EditorDemo(props) {
   } as any);
 
   const canvasInstance = canvasRef.current;
-
-  // 更新画布容器的高度
-  const canvasContainer = document.querySelector(".editor-canvas");
 
   /** 删除组件 */
   const handleDeleteNodes = (ids: string[]) => {
@@ -199,6 +198,16 @@ export default function EditorDemo(props) {
     setDragSelectable(false);
   };
 
+  /** 保存 */
+  const handleSave = async () => {
+    const data = await handleSaveData();
+    if (data) {
+      alert("保存成功");
+    } else {
+      alert("保存失败");
+    }
+  };
+
   useKeyPress(
     "delete",
     () => {
@@ -232,6 +241,7 @@ export default function EditorDemo(props) {
         changeScreenScale={changeScreenScale}
         handleResizeTo={canvasInstance && canvasInstance.handleResizeTo}
         items={[
+          "save",
           "fullscreen",
           "zoom",
           "adapt",
@@ -249,6 +259,7 @@ export default function EditorDemo(props) {
         onDelete={handleDelete}
         onShear={handleShear}
         onDragSelect={handleDragSelect}
+        onSave={handleSave}
       />
     </div>
   );

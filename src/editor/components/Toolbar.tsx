@@ -17,6 +17,7 @@ import "./Toolbar.scss";
 /** 操作面板，支持全屏、缩放、自适应画布、格式化、显示比例 */
 
 export type ToolbarType =
+  | "save"
   | "fullscreen"
   | "zoom"
   | "adapt"
@@ -26,7 +27,7 @@ export type ToolbarType =
   | "copy"
   | "paste"
   | "delete"
-  | 'dragSelect';
+  | "dragSelect";
 
 export class ToolbarProps {
   /** 适应画布 */
@@ -44,6 +45,8 @@ export class ToolbarProps {
   /** 格式化布局 */
   layout?: () => void;
 
+  onSave?: () => void;
+
   onShear?: () => void;
 
   onCopy?: () => void;
@@ -52,7 +55,7 @@ export class ToolbarProps {
 
   onDelete?: () => void;
 
-  onDragSelect?: ()=> void;
+  onDragSelect?: () => void;
 
   /** 处理全屏 */
   // handleFullScreen?: () => void;
@@ -72,9 +75,13 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
     onCopy,
     onPaste,
     onDelete,
-    onDragSelect
+    onDragSelect,
+    onSave
   } = props;
   const scale = String(Math.round(screenScale));
+
+  /** 是否保存 */
+  const isSave = items.includes("save");
 
   /** 是否支持全屏 */
 
@@ -151,6 +158,11 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
             </div>
           </>
         )}
+        {isSave && (
+          <div className="toolbar-btn">
+            <Icon type="save" onClick={onSave} />
+          </div>
+        )}
 
         {/* {isAdapt && (
           <div className="adapt">
@@ -207,7 +219,7 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
 
         {isDragSelect && (
           <div className="toolbar-btn">
-            <Icon type="border-outer" onClick={onDragSelect}/>         
+            <Icon type="border-outer" onClick={onDragSelect} />
           </div>
         )}
       </>
