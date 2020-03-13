@@ -4,7 +4,7 @@
  */
 
 import * as React from "react";
-import { Icon } from "antd";
+import { Icon, Tooltip } from "antd";
 import classNames from "classnames";
 import {
   launchFullscreen,
@@ -158,63 +158,88 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
         {isZoom && (
           <>
             <div className="toolbar-btn">
-              <Icon type="zoom-in" onClick={handleResize.bind(null, true)} />
+              <Tooltip title="缩小">
+                <Icon type="zoom-in" onClick={handleResize.bind(null, true)} />
+              </Tooltip>
             </div>
             <div className="toolbar-btn">
-              <Icon type="zoom-out" onClick={handleResize.bind(null, false)} />
+              <Tooltip title="放大">
+                <Icon
+                  type="zoom-out"
+                  onClick={handleResize.bind(null, false)}
+                />
+              </Tooltip>
             </div>
           </>
         )}
         {isSave && (
           <div className="toolbar-btn">
-            <Icon type="save" onClick={onSave} />
+            <Tooltip title="保存">
+              <Icon type="save" onClick={onSave} />
+            </Tooltip>
           </div>
         )}
 
         {isFullScreen && (
           <div className="toolbar-btn">
-            <Icon type={fullScreenClassName} onClick={handleFullScreen} />
+            <Tooltip title="全屏">
+              <Icon type={fullScreenClassName} onClick={handleFullScreen} />
+            </Tooltip>
           </div>
         )}
 
         {isShear && (
           <div className="toolbar-btn">
-            <Icon type="scissor" onClick={onShear} />
+            <Tooltip title="剪切">
+              <Icon type="scissor" onClick={onShear} />
+            </Tooltip>
           </div>
         )}
 
         {isCopy && (
           <div className="toolbar-btn">
-            <Icon type="copy" onClick={onCopy} />
+            <Tooltip title="复制">
+              <Icon type="copy" onClick={onCopy} />
+            </Tooltip>
           </div>
         )}
 
         {isPaste && (
           <div className="toolbar-btn">
-            <Icon type="snippets" onClick={onPaste} />
+            <Tooltip title="粘贴">
+              <Icon type="snippets" onClick={onPaste} />
+            </Tooltip>
           </div>
         )}
         {isDelete && (
           <div className="toolbar-btn">
-            <Icon type="delete" onClick={onDelete} />
+            <Tooltip title="删除">
+              <Icon type="delete" onClick={onDelete} />
+            </Tooltip>
           </div>
         )}
 
         {isDragSelect && (
           <div className="toolbar-btn">
-            <Icon type="gateway" onClick={onDragSelect} />
+            <Tooltip title="圈选">
+              <Icon type="gateway" onClick={onDragSelect} />
+            </Tooltip>
           </div>
         )}
 
         {isAdapt && (
           <div className="toolbar-btn">
-            <Icon type="border-outer" onClick={onAdapt} />
+            <Tooltip title="适应画布">
+              <Icon type="border-outer" onClick={onAdapt} />
+            </Tooltip>
           </div>
         )}
 
         {isLayout && (
           <div className="toolbar-btn">
-            <Icon type="layout" onClick={onLayout} />
+            <Tooltip title="格式化">
+              <Icon type="layout" onClick={onLayout} />
+            </Tooltip>
           </div>
         )}
       </>

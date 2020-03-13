@@ -60,7 +60,7 @@ export function useEditorStore() {
   const handleSaveData = async () => {
     const newNodes = nodes ?? [];
     newNodes.forEach(node => delete node.ref);
-    const result = await setEditorLocalData({ ...editorData, nodes: newNodes, links });
+    const result = await setEditorLocalData({ ...editorData as any, nodes: newNodes, links });
     return result
   };
 

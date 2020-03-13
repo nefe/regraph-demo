@@ -1,0 +1,94 @@
+.bubble-wrapper {
+  margin:0px auto;
+  width:850px;
+  height:600px;
+}
+.bubble-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  .icon-back {
+    font-size: 20px;
+    position: absolute;
+    top: 8px;
+    left: 420px;
+    cursor: pointer;
+    color: #6ca0f5;
+    z-index: 99;
+  }
+
+  .scene-center-title {
+    position: absolute;
+    font-size: 20px;
+    color: #fff;
+    top: 5px;
+    left: 274px;
+  }
+
+  .scene-center-legend {
+    position: absolute;
+    left: 220px;
+    bottom: 16px;
+
+    .data-storage {
+      display: inline-block;
+      line-height: 26px;
+      margin: 0 8px;
+
+      > div {
+        display: inline-block;
+        border: 1px solid #6ca0f5;
+        margin-left: 8px;
+        margin-right: 4px;
+        vertical-align: middle;
+      }
+
+      .small {
+        width: 8px;
+        height: 8px;
+        border-radius: 8px;
+      }
+
+      .middle {
+        width: 17px;
+        height: 17px;
+        border-radius: 17px;
+      }
+
+      .big {
+        width: 26px;
+        height: 26px;
+        border-radius: 26px;
+      }
+    }
+
+    .data-flow {
+      display: inline-block;
+      line-height: 26px;
+      margin: 0 8px;
+
+      .flow-arrow {
+        display: inline-block;
+        vertical-align: middle;
+        width: 120px;
+        height: 26px;
+      }
+    }
+  }
+
+  .scene-center-legend-selected {
+    left: 135px;
+  }
+}
+
+.bubble {
+  .bubble-nodes {
+    cursor: pointer;
+  }
+
+  .bubble-text {
+    cursor: pointer;
+  }
+}
+
