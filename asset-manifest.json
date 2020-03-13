@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/regraph-demo/static/css/main.17626b46.chunk.css",
-    "main.js": "/regraph-demo/static/js/main.5e82b298.chunk.js",
-    "main.js.map": "/regraph-demo/static/js/main.5e82b298.chunk.js.map",
+    "main.css": "/regraph-demo/static/css/main.beb9e3b3.chunk.css",
+    "main.js": "/regraph-demo/static/js/main.c5adea2d.chunk.js",
+    "main.js.map": "/regraph-demo/static/js/main.c5adea2d.chunk.js.map",
     "runtime-main.js": "/regraph-demo/static/js/runtime-main.499d57d8.js",
     "runtime-main.js.map": "/regraph-demo/static/js/runtime-main.499d57d8.js.map",
-    "static/css/2.74e1a1f8.chunk.css": "/regraph-demo/static/css/2.74e1a1f8.chunk.css",
-    "static/js/2.99d2a363.chunk.js": "/regraph-demo/static/js/2.99d2a363.chunk.js",
-    "static/js/2.99d2a363.chunk.js.map": "/regraph-demo/static/js/2.99d2a363.chunk.js.map",
+    "static/css/2.26da5556.chunk.css": "/regraph-demo/static/css/2.26da5556.chunk.css",
+    "static/js/2.f0ada95a.chunk.js": "/regraph-demo/static/js/2.f0ada95a.chunk.js",
+    "static/js/2.f0ada95a.chunk.js.map": "/regraph-demo/static/js/2.f0ada95a.chunk.js.map",
     "index.html": "/regraph-demo/index.html",
-    "precache-manifest.7690b7c34aeab2ac29ee8e9bbfcda935.js": "/regraph-demo/precache-manifest.7690b7c34aeab2ac29ee8e9bbfcda935.js",
+    "precache-manifest.59397dd76e26b8054a03ceb1bdb90599.js": "/regraph-demo/precache-manifest.59397dd76e26b8054a03ceb1bdb90599.js",
     "service-worker.js": "/regraph-demo/service-worker.js",
-    "static/css/2.74e1a1f8.chunk.css.map": "/regraph-demo/static/css/2.74e1a1f8.chunk.css.map",
-    "static/css/main.17626b46.chunk.css.map": "/regraph-demo/static/css/main.17626b46.chunk.css.map",
-    "static/js/2.99d2a363.chunk.js.LICENSE.txt": "/regraph-demo/static/js/2.99d2a363.chunk.js.LICENSE.txt"
+    "static/css/2.26da5556.chunk.css.map": "/regraph-demo/static/css/2.26da5556.chunk.css.map",
+    "static/css/main.beb9e3b3.chunk.css.map": "/regraph-demo/static/css/main.beb9e3b3.chunk.css.map",
+    "static/js/2.f0ada95a.chunk.js.LICENSE.txt": "/regraph-demo/static/js/2.f0ada95a.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.499d57d8.js",
-    "static/css/2.74e1a1f8.chunk.css",
-    "static/js/2.99d2a363.chunk.js",
-    "static/css/main.17626b46.chunk.css",
-    "static/js/main.5e82b298.chunk.js"
+    "static/css/2.26da5556.chunk.css",
+    "static/js/2.f0ada95a.chunk.js",
+    "static/css/main.beb9e3b3.chunk.css",
+    "static/js/main.c5adea2d.chunk.js"
   ]
 }
