@@ -8,7 +8,7 @@ import App from "./App";
 
 const rootElement = document.getElementById("root");
 render(
-  <BrowserRouter>
+  <BrowserRouter basename="regraph-demo">
     <App />
   </BrowserRouter>,
   rootElement
