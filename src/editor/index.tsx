@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 import * as uuid from "uuid";
-import { BaseLayout } from "regraph-next";
+import { message } from 'antd'
 import { Toolbar, NodePanel, DragSelector } from "./components";
 import CanvasContent from "./CanvasContent";
 import { useEditorStore, useKeyPress, useEventListener } from "./hooks";
@@ -203,9 +203,9 @@ export default function EditorDemo(props) {
   const handleSave = async () => {
     const data = await handleSaveData();
     if (data) {
-      alert("保存成功");
+      message.success("保存成功");
     } else {
-      alert("保存失败");
+      message.error("保存失败");
     }
   };
 
