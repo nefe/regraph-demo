@@ -1,5 +1,5 @@
 /**
- * @file 业务组件，基于Node的管道组件卡片
+ * @file 业务组件，基于Node的组件卡片
  * @author perkinJ
  */
 

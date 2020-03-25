@@ -111,13 +111,6 @@ export class NodePanel {
   disabled: boolean;
 }
 
-export enum OutputType {
-  /** 主步骤输出 */
-  mainOutput = "mainOutput",
-  /** 错误步骤输出 */
-  errorOutput = "errorOutput"
-}
-
 export type LINK_POSITION = "left" | "right" | "top" | "bottom";
 
 export interface Link {
@@ -133,14 +126,27 @@ export interface Link {
   targetPos?: string;
 }
 
-export type LinkType = "error" | "distribute" | "copy";
+export interface Group {
+  /** 组的id */
+  id: string;
+  /** 组在画布中的横坐标 */
+  x?: number;
 
-// 连线中不同状态的icon
-export const LinkTypeIconMap: Record<LinkType, string> = {
-  error: "icon-cuowu",
-  distribute: "icon-fenfa",
-  copy: "icon-fuzhi1"
-};
+  /** 组在画布中的纵坐标 */
+  y?: number;
+
+  /** 包含的节点id */
+  nodes?: string[];
+
+  /** 对应的 ref */
+  ref?: any;
+
+  /** 其他信息 */
+  extraInfo?: any;
+}
+
+// group padding
+export const GROUP_PADDING = 20;
 
 // 连线中的icon，宽高
 export const LINKICON_WIDTH = 18;
@@ -148,7 +154,7 @@ export const LINKICON_HEIGHT = 18;
 
 export enum ComponentKey {
   rect = "rect",
-  rectRadius = 'rectRadius',
+  rectRadius = "rectRadius",
   circle = "circle",
   diamond = "diamond",
   polygon = "polygon",
@@ -179,7 +185,14 @@ const COMMON_COMPONENT: Node[] = [
     width: 100,
     height: 100,
     icon: (
-      <div style={{ width: 36, height: 36, border: "2px solid #52619b", borderRadius: 10 }} />
+      <div
+        style={{
+          width: 36,
+          height: 36,
+          border: "2px solid #52619b",
+          borderRadius: 10
+        }}
+      />
     ),
     disabled: false
   },
@@ -208,8 +221,8 @@ const COMMON_COMPONENT: Node[] = [
       </svg>
     ),
     disabled: false
-  },
-]
+  }
+];
 
 // 组件库类目
 export const COMPONENT_CATEGORY: Record<ComponentType, Node[]> = {
@@ -252,5 +265,5 @@ export { MenuPos };
 // 操作类型
 export enum OperateType {
   copy = "copy",
-  delete = "delete",
+  delete = "delete"
 }

@@ -1,12 +1,13 @@
 import * as React from "react";
 import * as _ from "lodash";
 import * as uuid from "uuid";
-import { message } from 'antd'
+import { message } from "antd";
 import { Toolbar, NodePanel, DragSelector } from "./components";
 import CanvasContent from "./CanvasContent";
 import { useEditorStore, useKeyPress, useEventListener } from "./hooks";
 import { ShapeProps } from "./utils/useDragSelect";
 import { pointInPoly } from "./utils/layout";
+import { GROUP_PADDING } from "./defines";
 
 import "./index.scss";
 
@@ -33,7 +34,9 @@ export default function EditorDemo(props) {
     setCopiedNodes,
     currTrans,
     setCurrTrans,
-    handleSaveData
+    handleSaveData,
+    groups,
+    setGroups
   } = useEditorStore();
 
   // 画布容器
@@ -97,7 +100,6 @@ export default function EditorDemo(props) {
   /** 粘贴节点 */
   const handleNodesPaste = () => {
     if (copiedNodes) {
-      console.log('copiedNodes',copiedNodes)
       const currentCopied = copiedNodes.map(node => {
         return {
           ...node,
@@ -195,7 +197,7 @@ export default function EditorDemo(props) {
         return point.id;
       }
     });
-    setSelectedNodes(ids);
+    setSelectedNodes(_.compact(ids));
     setDragSelectable(false);
   };
 
@@ -207,6 +209,34 @@ export default function EditorDemo(props) {
     } else {
       message.error("保存失败");
     }
+  };
+
+  /** 成组 */
+  const handleGroup = () => {
+    // 1. 计算选中节点的位置，形成大的group
+    const minXId = _.minBy(
+      selectedNodes,
+      id => _.find(nodes, node => node.id === id)?.x
+    );
+    const minX =
+      _.find(nodes, node => node.id === minXId)?.x ?? 0 - GROUP_PADDING;
+
+    const minYId = _.minBy(
+      selectedNodes,
+      id => _.find(nodes, node => node.id === id)?.y
+    );
+
+    const minY =
+      _.find(nodes, node => node.id === minYId)?.y ?? 0 - GROUP_PADDING;
+
+    const newGroup = {
+      id: `group_${minXId}_${minYId}`,
+      x: minX,
+      y: minY,
+      nodes: selectedNodes
+    };
+
+    setGroups([...groups, newGroup]);
   };
 
   useKeyPress(
@@ -233,16 +263,26 @@ export default function EditorDemo(props) {
     handlePaste();
   });
 
-  useEventListener("keydown", (event:KeyboardEvent) => {
-    const SUPER_KEY_CODE = navigator.platform.startsWith('Mac') ? event.metaKey : event.ctrlKey;
-    if(SUPER_KEY_CODE) {
-      setKeyPressing(true)
-    }
-  }, canvasInstance);
+  useEventListener(
+    "keydown",
+    (event: KeyboardEvent) => {
+      const SUPER_KEY_CODE = navigator.platform.startsWith("Mac")
+        ? event.metaKey
+        : event.ctrlKey;
+      if (SUPER_KEY_CODE) {
+        setKeyPressing(true);
+      }
+    },
+    canvasInstance
+  );
 
-  useEventListener("keyup", (event:KeyboardEvent) => {
-    setKeyPressing(false)
-  }, canvasInstance);
+  useEventListener(
+    "keyup",
+    (event: KeyboardEvent) => {
+      setKeyPressing(false);
+    },
+    canvasInstance
+  );
 
   /** 操作区 */
   const renderOperation = (
@@ -265,7 +305,8 @@ export default function EditorDemo(props) {
           "delete",
           "dragSelect",
           "layout",
-          "adapt"
+          "adapt",
+          "group"
         ]}
         onCopy={handleCopy}
         onPaste={handlePaste}
@@ -275,6 +316,7 @@ export default function EditorDemo(props) {
         onSave={handleSave}
         onLayout={canvasInstance && canvasInstance.layout}
         onAdapt={canvasInstance && canvasInstance.handleShowAll}
+        onGroup={handleGroup}
       />
     </div>
   );
@@ -305,6 +347,7 @@ export default function EditorDemo(props) {
         ref={canvasRef}
         nodes={nodes}
         links={links}
+        groups={groups}
         setNodes={setNodes}
         setLinks={setLinks}
         selectedLinks={selectedLinks}

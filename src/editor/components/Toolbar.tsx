@@ -29,7 +29,8 @@ export type ToolbarType =
   | "delete"
   | "dragSelect"
   | "layout"
-  | "adapt";
+  | "adapt"
+  | "group";
 
 export class ToolbarProps {
   /** 适应画布 */
@@ -60,6 +61,8 @@ export class ToolbarProps {
 
   onAdapt?: () => void;
 
+  onGroup?: () => void;
+
   /** 处理全屏 */
   // handleFullScreen?: () => void;
   /** Toolbar选项 */
@@ -81,7 +84,8 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
     onDragSelect,
     onSave,
     onLayout,
-    onAdapt
+    onAdapt,
+    onGroup,
   } = props;
   const scale = String(Math.round(screenScale));
 
@@ -113,6 +117,8 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
   const isDragSelect = items.includes("dragSelect");
 
   const isLayout = items.includes("layout");
+
+  const isGroup = items.includes("group");
 
   /** 当前是否是全屏状态 */
 
@@ -239,6 +245,14 @@ const Toolbar = React.forwardRef((props: ToolbarProps, ref: any) => {
           <div className="toolbar-btn">
             <Tooltip title="格式化">
               <Icon type="layout" onClick={onLayout} />
+            </Tooltip>
+          </div>
+        )}
+
+        {isGroup && (
+          <div className="toolbar-btn">
+            <Tooltip title="成组">
+              <Icon type="block" onClick={onGroup} />
             </Tooltip>
           </div>
         )}

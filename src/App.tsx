@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Layout, Menu } from "antd";
 import { Switch, Route, Link, useLocation, useHistory } from "react-router-dom";
-import Editor from "./editor";
-import Bubble from "./bubble";
+import Editor from "./Editor";
+import Bubble from "./Bubble";
 
 import "./styles.scss";
 const { useState, useEffect } = React;
@@ -16,7 +16,6 @@ export default function App() {
     setMenuKey(pathname);
   }, [location]);
 
-  console.log('menuKey',menuKey)
   return (
     <Layout className="layout">
       <Header>

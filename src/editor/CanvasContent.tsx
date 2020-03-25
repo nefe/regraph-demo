@@ -9,6 +9,7 @@ import { ReScreen, BaseLayout } from "regraph-next";
 import { ZoomTransform, zoomIdentity } from "d3-zoom";
 import { Menu } from "antd";
 import { EditorNode } from "./EditorNode";
+import { EditorGroup } from "./EditorGroup";
 import { EditorEdges } from "./EditorEdges";
 import { ContextMenu } from "./ContextMenu";
 import {
@@ -17,6 +18,7 @@ import {
   OperateType,
   Link,
   Node,
+  Group,
   NODE_WIDTH,
   NODE_HEIGHT,
   LINK_AREA
@@ -36,8 +38,10 @@ class CanvasContentProps {
   ref: any;
   nodes: Node[];
   links: Link[];
+  groups: Group[];
   setNodes: (nodes: Node[]) => void;
   setLinks: (links: Link[]) => void;
+  setGroups?: (groups: Group[]) => void;
   selectedLinks: string[];
   setSelectedLinks: (links: string[]) => void;
   selectedNodes: string[];
@@ -647,7 +651,12 @@ export default class CanvasContent extends React.Component<
 
   /** 点击节点 */
   onClickNode = (currentNode: Node) => {
-    const { selectedNodes, setSelectedNodes,setSelectedLinks,isKeyPressing } = this.props;
+    const {
+      selectedNodes,
+      setSelectedNodes,
+      setSelectedLinks,
+      isKeyPressing
+    } = this.props;
 
     // 区分多选按钮是否按下
     if (isKeyPressing) {
@@ -729,12 +738,12 @@ export default class CanvasContent extends React.Component<
 
   renderCanvas = () => {
     const { currentHoverNode } = this.state;
-    const { nodes, links, selectedNodes, selectedLinks } = this.props;
+    const { nodes, links, selectedNodes, selectedLinks, groups } = this.props;
     return (
       <div className="editor-view">
         <div className="editor-view-content" ref={this.nodesContainerRef}>
           {nodes.map(child => {
-            const id = child.id;
+            const id = child?.id;
             const isSelected = selectedNodes
               ? selectedNodes.includes(id)
               : false;
@@ -753,6 +762,23 @@ export default class CanvasContent extends React.Component<
               />
             );
           })}
+
+          {groups.map(child => {
+            const id = child?.id;
+            const nodesInGroup = _.compact(nodes.map(node => {
+              if (child.nodes.includes(node.id)) return node;
+            }));
+            return (
+              <EditorGroup
+                key={id}
+                id={id}
+                groupRef={child.ref}
+                currentGroup={child}
+                nodes={nodesInGroup}
+              />
+            );
+          })}
+
           <EditorEdges
             links={links}
             nodes={nodes}

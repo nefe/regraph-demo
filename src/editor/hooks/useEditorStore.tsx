@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as _ from "lodash";
-import { Node, Link } from "../defines";
+import { Node, Link, Group } from "../defines";
 import { ZoomTransform, zoomIdentity } from "d3-zoom";
 import { useLocalStorage } from "./useLocalStorage";
 
@@ -10,6 +10,7 @@ export function useEditorStore() {
   const [editorData, setEditorData] = useState();
   const [nodes, setNodes] = useState<Node[]>([]);
   const [links, setLinks] = useState<Link[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [selectedLinks, setSelectedLinks] = useState<string[]>([]);
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
   const [editorLocalData, setEditorLocalData] = useLocalStorage("editorData", {
@@ -31,6 +32,14 @@ export function useEditorStore() {
       };
     });
     setNodes(newNodes);
+
+    const newGroups = (editorLocalData?.groups ?? []).map(item => {
+      return {
+        ...item,
+        ref: React.createRef()
+      };
+    });
+    setGroups(newGroups);
     setLinks(editorLocalData?.links ?? []);
   }, [editorLocalData]);
 
@@ -59,9 +68,17 @@ export function useEditorStore() {
 
   const handleSaveData = async () => {
     const newNodes = nodes ?? [];
+    const newGroups = groups ?? [];
     newNodes.forEach(node => delete node.ref);
-    const result = await setEditorLocalData({ ...editorData as any, nodes: newNodes, links });
-    return result
+    newGroups.forEach(group => delete group.ref);
+
+    const result = await setEditorLocalData({
+      ...(editorData as any),
+      nodes: newNodes,
+      groups: newGroups,
+      links
+    });
+    return result;
   };
 
   return {
@@ -85,6 +102,8 @@ export function useEditorStore() {
     setCurrTrans,
     editorLocalData,
     setEditorLocalData,
-    handleSaveData
+    handleSaveData,
+    groups,
+    setGroups
   };
 }
