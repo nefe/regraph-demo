@@ -13,5 +13,5 @@ export {
   useKeyPress,
   useLocalStorage,
   useResize,
-  useEventListener
+  useEventListener,
 };

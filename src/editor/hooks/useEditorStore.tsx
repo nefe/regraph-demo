@@ -66,6 +66,18 @@ export function useEditorStore() {
     setLinks(newLinks);
   };
 
+  const updateGroups = (group: Group) => {
+    const index = groups.findIndex(item => item.id === group.id);
+
+    const newGroups = [
+      ...groups.slice(0, index),
+      group,
+      ...groups.slice(index + 1)
+    ];
+
+    setGroups(newGroups);
+  };
+
   const handleSaveData = async () => {
     const newNodes = nodes ?? [];
     const newGroups = groups ?? [];
@@ -104,6 +116,7 @@ export function useEditorStore() {
     setEditorLocalData,
     handleSaveData,
     groups,
-    setGroups
+    setGroups,
+    updateGroups
   };
 }

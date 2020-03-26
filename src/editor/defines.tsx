@@ -79,13 +79,14 @@ export class Node {
 
   /** 组件在画布中的纵坐标 */
   y?: number;
-  /** 生成 id */
 
   width?: number;
 
   height?: number;
 
   id?: string;
+
+  groupId?: string;
 
   /** 对应的 ref */
   ref?: any;
@@ -130,16 +131,23 @@ export interface Group {
   /** 组的id */
   id: string;
   /** 组在画布中的横坐标 */
-  x?: number;
+  x: number;
 
   /** 组在画布中的纵坐标 */
-  y?: number;
+  y: number;
+
+  width: number;
+
+  height: number;
 
   /** 包含的节点id */
-  nodes?: string[];
+  nodes?: Node[];
 
   /** 对应的 ref */
   ref?: any;
+
+  /** 父级 */
+  parentId?: string;
 
   /** 其他信息 */
   extraInfo?: any;

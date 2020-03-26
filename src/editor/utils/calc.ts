@@ -5,6 +5,7 @@
 
 import * as _ from "lodash";
 import { Point, Shape, ShapeProps } from "./types";
+import { Node, Group } from "../defines";
 /**
  * 两点间直线距离
  * @param sourcePoint
@@ -175,4 +176,9 @@ export function handlePathData(shape: Shape, shapeProps: ShapeProps): string {
     }
   }
   return pathData;
+}
+
+// 判断节点是否离开某个组
+export function checkNodeIsOverGroup(node: Node, group: Group) {
+  
 }

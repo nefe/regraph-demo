@@ -21,11 +21,20 @@ export class GroupProps {
 
   height: number;
 
+  /** 点击节点 */
+  onClick?: (event) => void;
+
+  /** ContextMenu */
+  onContextMenu?: (position: any, event) => void;
+
+  /** dbClick */
+  onDoubleClick?: (event) => void;
+
   children?: React.ReactNode;
 }
 
 const Group = React.forwardRef((props: GroupProps, ref: any) => {
-  const { x, y, width, height, children } = props;
+  const { x, y, width, height, children, onDoubleClick, onClick } = props;
   const containerRef = useRef(null);
 
   return (
@@ -38,6 +47,8 @@ const Group = React.forwardRef((props: GroupProps, ref: any) => {
         height
       }}
       ref={ref}
+      onDoubleClick={onDoubleClick}
+      onClick={onClick}
     >
       {React.cloneElement(children as React.ReactElement<any>, {
         ref: containerRef

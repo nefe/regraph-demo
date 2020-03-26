@@ -32,6 +32,7 @@ import {
   findNearbyNode
 } from "./utils/find";
 import { calcLinkPosition } from "./utils/calc";
+import { pointInPoly } from "./utils/layout";
 import { exitFullscreen, launchFullscreen, isFull, getOffset } from "../utils";
 
 class CanvasContentProps {
@@ -50,6 +51,7 @@ class CanvasContentProps {
   dragNode: Node;
   updateNodes: (node: Node) => void;
   updateLinks: (link: Link) => void;
+  updateGroups?: (nodes: Node[], deleteGroupId?: string) => void;
   deleteNodes: (selectedNodes: string[]) => void;
   deleteLinks: (selectedLinks: string[]) => void;
   copiedNodes: Node[];
@@ -142,6 +144,9 @@ export default class CanvasContent extends React.Component<
       this.openContainerMenu
     );
     this.container.current.addEventListener("click", this.onContainerMouseDown);
+
+    // 初始化布局
+    this.handleApplyTransform(zoomIdentity);
   }
 
   componentWillUnmount() {
@@ -168,6 +173,9 @@ export default class CanvasContent extends React.Component<
     }
     if (this.state.isDraggingLink !== nextState.isDraggingLink) {
       this.toggleDragLink(nextState.isDraggingLink);
+    }
+    if (nextProps.groups !== this.props.groups) {
+      this.forceUpdate();
     }
   }
 
@@ -297,7 +305,6 @@ export default class CanvasContent extends React.Component<
     const { offsetTop, offsetLeft } = getOffset(this.container.current);
     const screenX = event.clientX - offsetLeft;
     const screenY = event.clientY - offsetTop;
-
     this.setState(preState => {
       // 计算鼠标位置在节点中的偏移量
       return {
@@ -368,12 +375,48 @@ export default class CanvasContent extends React.Component<
     });
   };
 
+  /** 处理节点与组的关系 */
+  handleNodeIsOverGroup = (currentGroup: Group, dragNode: Node) => {
+    const { updateNodes, updateGroups } = this.props;
+    const { x: groupX, y: groupY, width, height } = currentGroup;
+
+    const P1 = { x: dragNode?.x, y: dragNode?.y };
+    const P2 = { x: dragNode?.x + dragNode?.width, y: dragNode?.y };
+    const P3 = {
+      x: dragNode?.x + dragNode?.width,
+      y: dragNode?.y + dragNode?.height
+    };
+    const P4 = { x: dragNode?.x, y: dragNode?.y + dragNode?.height };
+
+    const polyPoint = [
+      { x: groupX, y: groupY },
+      { x: groupX + width, y: groupY },
+      { x: groupX + width, y: groupY + height },
+      { x: groupX, y: groupY + height }
+    ];
+
+    // 射线法判断该节点是否在组外
+    if (
+      pointInPoly(P1, polyPoint) === "out" ||
+      pointInPoly(P2, polyPoint) === "out" ||
+      pointInPoly(P3, polyPoint) === "out" ||
+      pointInPoly(P4, polyPoint) === "out"
+    ) {
+      updateNodes({ ...dragNode, groupId: "" });
+      const newNodes = currentGroup.nodes.filter(
+        node => node.id !== dragNode.id
+      );
+      // 更新组，重新计算组的宽度
+      updateGroups(newNodes, dragNode.groupId);
+    }
+  };
+
   /** 移动节点 */
   onDragNodeMouseMove = (event: any) => {
     event.preventDefault();
     event.stopPropagation();
 
-    const { setNodes, nodes } = this.props;
+    const { setNodes, nodes, groups } = this.props;
 
     const { k, x, y } = this.props.currTrans;
 
@@ -419,16 +462,17 @@ export default class CanvasContent extends React.Component<
   /** 放开节点 */
   onDragNodeMouseUp = (event: any) => {
     event.stopPropagation();
-    // this.moveStop(true);
-    // this.moveStop(false);
+    const { groups } = this.props;
 
-    this.setState(preState => {
-      const { dragNode } = preState;
+    const { dragNode } = this.state;
 
-      return {
-        ...preState
-      };
-    });
+    // 找到该节点属于哪个组中
+    const groupId = dragNode?.groupId;
+    const currentGroup = groups.find(group => group.id === groupId);
+
+    if (currentGroup) {
+      this.handleNodeIsOverGroup(currentGroup, dragNode);
+    }
     this.setState({
       isDraggingNode: false
     });
@@ -742,7 +786,7 @@ export default class CanvasContent extends React.Component<
     return (
       <div className="editor-view">
         <div className="editor-view-content" ref={this.nodesContainerRef}>
-          {nodes.map(child => {
+          {(nodes || []).map(child => {
             const id = child?.id;
             const isSelected = selectedNodes
               ? selectedNodes.includes(id)
@@ -763,16 +807,14 @@ export default class CanvasContent extends React.Component<
             );
           })}
 
-          {groups.map(child => {
+          {(groups || []).map(child => {
             const id = child?.id;
-            const nodesInGroup = _.compact(nodes.map(node => {
-              if (child.nodes.includes(node.id)) return node;
-            }));
+            const nodesInGroup = child?.nodes;
             return (
               <EditorGroup
                 key={id}
                 id={id}
-                groupRef={child.ref}
+                groupRef={child?.ref}
                 currentGroup={child}
                 nodes={nodesInGroup}
               />
