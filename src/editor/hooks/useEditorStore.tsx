@@ -81,8 +81,15 @@ export function useEditorStore() {
   const handleSaveData = async () => {
     const newNodes = nodes ?? [];
     const newGroups = groups ?? [];
+
+    // 保存数据时，需要去掉ref
     newNodes.forEach(node => delete node.ref);
-    newGroups.forEach(group => delete group.ref);
+    newGroups.forEach(group => {
+      delete group.ref;
+      group.nodes.forEach(node => {
+        delete node.ref;
+      });
+    });
 
     const result = await setEditorLocalData({
       ...(editorData as any),

@@ -178,7 +178,4 @@ export function handlePathData(shape: Shape, shapeProps: ShapeProps): string {
   return pathData;
 }
 
-// 判断节点是否离开某个组
-export function checkNodeIsOverGroup(node: Node, group: Group) {
-  
-}
+

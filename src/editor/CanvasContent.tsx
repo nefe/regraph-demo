@@ -32,7 +32,7 @@ import {
   findNearbyNode
 } from "./utils/find";
 import { calcLinkPosition } from "./utils/calc";
-import { pointInPoly } from "./utils/layout";
+import { pointInPoly, checkNodeIsOverGroup } from "./utils/layout";
 import { exitFullscreen, launchFullscreen, isFull, getOffset } from "../utils";
 
 class CanvasContentProps {
@@ -67,10 +67,16 @@ class CanvasContentState {
   isDraggingNode: boolean;
   /** 拖拽边 */
   isDraggingLink: boolean;
+  /** 拖拽组 */
+  isDraggingGroup: boolean;
+  /** 拖拽组 */
+  dragGroup: Group;
   /** 拖拽节点 */
   dragNode: Node;
   /** 鼠标位置在拖动节点的偏移量 */
   dragNodeOffset: any;
+  /** 鼠标位置在拖动组的偏移量 */
+  dragGroupOffset: any;
   /** 移动边 */
   dragLink: {
     /** 源起节点id */
@@ -115,9 +121,12 @@ export default class CanvasContent extends React.Component<
     this.state = {
       isDraggingNode: false,
       isDraggingLink: false,
+      isDraggingGroup: false,
       dragNode: null,
       dragLink: null,
+      dragGroup: null,
       dragNodeOffset: null,
+      dragGroupOffset: null,
       menuDisplay: false,
       menuPos: {
         id: "",
@@ -131,7 +140,6 @@ export default class CanvasContent extends React.Component<
     };
     this.nodesContainerRef = React.createRef();
     this.container = React.createRef();
-    // this.props.currTrans = zoomIdentity;
   }
 
   componentDidMount() {
@@ -174,6 +182,9 @@ export default class CanvasContent extends React.Component<
     if (this.state.isDraggingLink !== nextState.isDraggingLink) {
       this.toggleDragLink(nextState.isDraggingLink);
     }
+    if (this.state.isDraggingGroup !== nextState.isDraggingGroup) {
+      this.toggleDragGroup(nextState.isDraggingGroup);
+    }
     if (nextProps.groups !== this.props.groups) {
       this.forceUpdate();
     }
@@ -182,6 +193,16 @@ export default class CanvasContent extends React.Component<
   /** 打开全局操作菜单，包括复制，粘贴，删除等 */
   openContainerMenu = (event: any) => {
     event.preventDefault();
+  };
+
+  toggleDragGroup = (isDraggingGroup: Boolean) => {
+    if (isDraggingGroup) {
+      window.addEventListener("mousemove", this.onDragGroupMouseMove);
+      window.addEventListener("mouseup", this.onDragGroupMouseUp);
+    } else {
+      window.removeEventListener("mousemove", this.onDragGroupMouseMove);
+      window.removeEventListener("mouseup", this.onDragGroupMouseUp);
+    }
   };
 
   toggleDragNode = (isDraggingNode: Boolean) => {
@@ -229,9 +250,9 @@ export default class CanvasContent extends React.Component<
   /** 监听整个区域，提升性能 */
   onNodesContainerMouseDown = (event: any) => {
     event.stopPropagation();
-    const { nodes } = this.props;
+    const { nodes, groups } = this.props;
     if (nodes && nodes.length > 0) {
-      const component = _.find(nodes, c => {
+      const currentNode = _.find(nodes, c => {
         if (c.ref && c.ref.current) {
           return c.ref.current.contains(event.target);
         }
@@ -241,18 +262,28 @@ export default class CanvasContent extends React.Component<
       const type = event.target.dataset && event.target.dataset.type;
       const position = event.target.dataset && event.target.dataset.position;
 
-      if (component) {
+      if (currentNode) {
         if (type === "edge" && position) {
           /** 拖拽连线 */
-          this.onDragLinkMouseDown(component as any, position);
+          this.onDragLinkMouseDown(currentNode as any, position);
           return;
         } else if (type === "resize") {
           return;
         } else {
           /** 拖拽节点，排除resize节点 */
-          this.onDragNodeMouseDown(component as any, event);
+          this.onDragNodeMouseDown(currentNode as any, event);
         }
       }
+    }
+
+    if (groups && groups.length > 0) {
+      const currentGroup = _.find(groups, c => {
+        if (c.ref && c.ref.current) {
+          return c.ref.current.contains(event.target);
+        }
+        return false;
+      });
+      this.onDragGroupMouseDown(currentGroup as any, event);
     }
   };
 
@@ -296,26 +327,6 @@ export default class CanvasContent extends React.Component<
         }
       }
     }
-  };
-
-  /** 按下节点 */
-  onDragNodeMouseDown = (node: Node, event: any) => {
-    const { k, x, y } = this.props.currTrans;
-
-    const { offsetTop, offsetLeft } = getOffset(this.container.current);
-    const screenX = event.clientX - offsetLeft;
-    const screenY = event.clientY - offsetTop;
-    this.setState(preState => {
-      // 计算鼠标位置在节点中的偏移量
-      return {
-        isDraggingNode: true,
-        dragNode: node,
-        dragNodeOffset: {
-          x: (screenX - x) / k - node.x,
-          y: (screenY - y) / k - node.y
-        }
-      };
-    });
   };
 
   /** 鼠标按下，进行连线 */
@@ -378,36 +389,45 @@ export default class CanvasContent extends React.Component<
   /** 处理节点与组的关系 */
   handleNodeIsOverGroup = (currentGroup: Group, dragNode: Node) => {
     const { updateNodes, updateGroups } = this.props;
-    const { x: groupX, y: groupY, width, height } = currentGroup;
 
-    const P1 = { x: dragNode?.x, y: dragNode?.y };
-    const P2 = { x: dragNode?.x + dragNode?.width, y: dragNode?.y };
-    const P3 = {
-      x: dragNode?.x + dragNode?.width,
-      y: dragNode?.y + dragNode?.height
-    };
-    const P4 = { x: dragNode?.x, y: dragNode?.y + dragNode?.height };
-
-    const polyPoint = [
-      { x: groupX, y: groupY },
-      { x: groupX + width, y: groupY },
-      { x: groupX + width, y: groupY + height },
-      { x: groupX, y: groupY + height }
-    ];
-
-    // 射线法判断该节点是否在组外
-    if (
-      pointInPoly(P1, polyPoint) === "out" ||
-      pointInPoly(P2, polyPoint) === "out" ||
-      pointInPoly(P3, polyPoint) === "out" ||
-      pointInPoly(P4, polyPoint) === "out"
-    ) {
+    if (checkNodeIsOverGroup(dragNode, currentGroup, "leave") === "out") {
+      // 该节点是否在组外
+      console.log("leave out", dragNode);
       updateNodes({ ...dragNode, groupId: "" });
       const newNodes = currentGroup.nodes.filter(
         node => node.id !== dragNode.id
       );
       // 更新组，重新计算组的宽度
       updateGroups(newNodes, dragNode.groupId);
+    } else {
+      console.log("leave in");
+      // 改变组的大小
+      const newNodes = currentGroup.nodes.map(node =>
+        node.id === dragNode.id ? dragNode : node
+      );
+      updateGroups(newNodes);
+    }
+  };
+
+  /** 按下节点 */
+  onDragNodeMouseDown = (node: Node, event: any) => {
+    if (node) {
+      const { k, x, y } = this.props.currTrans;
+
+      const { offsetTop, offsetLeft } = getOffset(this.container.current);
+      const screenX = event.clientX - offsetLeft;
+      const screenY = event.clientY - offsetTop;
+      this.setState(preState => {
+        // 计算鼠标位置在节点中的偏移量
+        return {
+          isDraggingNode: true,
+          dragNode: node,
+          dragNodeOffset: {
+            x: (screenX - x) / k - node.x,
+            y: (screenY - y) / k - node.y
+          }
+        };
+      });
     }
   };
 
@@ -462,19 +482,143 @@ export default class CanvasContent extends React.Component<
   /** 放开节点 */
   onDragNodeMouseUp = (event: any) => {
     event.stopPropagation();
-    const { groups } = this.props;
+    const { groups, updateNodes, updateGroups } = this.props;
 
     const { dragNode } = this.state;
+    // 通过是否有groupId来区分是从组中脱离还是拖入组中
+    if (groups) {
+      groups.forEach(group => {
+        const { nodes } = group;
 
-    // 找到该节点属于哪个组中
-    const groupId = dragNode?.groupId;
-    const currentGroup = groups.find(group => group.id === groupId);
-
-    if (currentGroup) {
-      this.handleNodeIsOverGroup(currentGroup, dragNode);
+        // 判断根据拖拽的节点有无groupId来属于enter还是leave
+        const groupId = dragNode?.groupId;
+        if (groupId) {
+          // 拖出
+          this.handleNodeIsOverGroup(group, dragNode);
+        } else {
+          // 考虑是否在组内
+          if(checkNodeIsOverGroup(dragNode, group,"enter") === "in") {
+            const newNodes = [...nodes, dragNode];
+            // 更新组，重新计算组的宽度
+            updateGroups(newNodes);
+          } else {
+            updateGroups(nodes)
+          }
+        }
+      });
     }
+
     this.setState({
       isDraggingNode: false
+    });
+  };
+
+  /** 按下组 */
+  onDragGroupMouseDown = (group: Group, event: any) => {
+    if (group) {
+      const { k, x, y } = this.props.currTrans;
+
+      const { offsetTop, offsetLeft } = getOffset(this.container.current);
+      const screenX = event.clientX - offsetLeft;
+      const screenY = event.clientY - offsetTop;
+      this.setState(preState => {
+        // 计算鼠标位置在节点中的偏移量
+        return {
+          isDraggingGroup: true,
+          dragGroup: group,
+          dragGroupOffset: {
+            x: (screenX - x) / k - group.x,
+            y: (screenY - y) / k - group.y
+          }
+        };
+      });
+    }
+  };
+
+  /** 移动组 */
+  onDragGroupMouseMove = (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const { setGroups, groups, nodes, setNodes } = this.props;
+
+    const { k, x, y } = this.props.currTrans;
+
+    const { offsetTop, offsetLeft } = getOffset(this.container.current);
+    const screenX = event.clientX - offsetLeft;
+    const screenY = event.clientY - offsetTop;
+    let diffX = 0;
+    let diffY = 0;
+
+    this.setState(preState => {
+      const { dragGroup, dragGroupOffset } = preState;
+
+      const newX = (screenX - x) / k - dragGroupOffset.x;
+      const newY = (screenY - y) / k - dragGroupOffset.y;
+
+      diffX = dragGroup.x - newX;
+      diffY = dragGroup.y - newY;
+
+      return {
+        ...preState,
+        dragGroup: {
+          ...dragGroup,
+          x: newX,
+          y: newY
+        }
+      };
+    });
+
+    const { dragGroupOffset, dragGroup } = this.state;
+
+    const newGroups = groups.map(c => {
+      if (c.id === dragGroup.id) {
+        const nodes = c.nodes;
+        return {
+          ...c,
+          x: (screenX - x) / k - dragGroupOffset.x,
+          y: (screenY - y) / k - dragGroupOffset.y,
+          // 更新节点
+          nodes: nodes.map(node => {
+            return {
+              ...node,
+              x: node.x - diffX,
+              y: node.y - diffY
+            };
+          })
+        };
+      } else {
+        return c;
+      }
+    });
+    // 同时更新nodes
+
+    const newNodes = nodes.map(node => {
+      if (node.groupId === dragGroup.id) {
+        return {
+          ...node,
+          x: node.x - diffX,
+          y: node.y - diffY
+        };
+      } else {
+        return node;
+      }
+    });
+    setNodes(newNodes);
+    setGroups(newGroups);
+  };
+
+  /** 放开组 */
+  onDragGroupMouseUp = (event: any) => {
+    event.stopPropagation();
+    const { groups, updateNodes, updateGroups } = this.props;
+
+    const { dragGroup } = this.state;
+
+    this.setState({
+      isDraggingGroup: false,
+      dragGroup: null,
+      dragGroupOffset: null
     });
   };
 
@@ -671,7 +815,6 @@ export default class CanvasContent extends React.Component<
       };
     });
     setNodes(layoutNodes);
-    // this.handleShowAll(layoutNodes);
   };
 
   /** 点击连线 */

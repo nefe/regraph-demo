@@ -232,7 +232,6 @@ export default function EditorDemo(props) {
     if (!nodes) {
       return;
     }
-
     const minXNode = _.minBy(nodes, node => node.x);
     const minYNode = _.minBy(nodes, node => node.y);
 
@@ -255,38 +254,58 @@ export default function EditorDemo(props) {
         y,
         width,
         height,
-        nodes
+        nodes: nodes.map(node => ({
+          ...node,
+          groupId: `group_${minXId}_${maxYId}`
+        })),
+        ref: React.createRef()
       };
     }
   };
 
-  /** 更新组的样式 */
-  const updateGroupsInfo = (currentNodes: Node[], deleteGroupId?: string) => {
+  /** 更新组的数据 */
+  const updateGroupsInfo = (
+    currentNodes: Node[],
+    type = "merge" as "merge" | "new",  // 区分是合并还是新组
+    deleteGroupId?: string
+  ) => {
     const newGroup = handleGroupInfo(currentNodes);
     if (newGroup) {
       // 更新节点
       const groupId = newGroup.id;
-      const groupNodes = newGroup.nodes.map(node => {
-        return { ...node, groupId };
-      });
-
+      const groupNodes = newGroup.nodes.map(node => ({ ...node, groupId }));
+      // 原来的groupId
+      const originGroupId = currentNodes[0].groupId;
+      // 更新节点
       const newNodes = nodes.map(node => {
         const groupNode = _.find(groupNodes, item => item.id === node.id);
         if (groupNode) {
           return groupNode;
         } else {
-          return node;
+          const { groupId, ...newNode } = node;
+          return newNode;
         }
       });
 
       setNodes(newNodes);
 
-      let newGroups = _.uniqBy(_.compact([...groups, newGroup]), "id");
+      let newGroups =
+        type === "merge"
+          ? groups.filter(group => group.id !== originGroupId)
+          : groups;
+
+      if (type === "merge" && newGroups && newGroups.length > 0) {
+        newGroups = newGroups.map(group => {
+          return group.id === newGroup.id ? newGroup : group;
+        });
+      } else {
+        newGroups.push(newGroup);
+      }
+
+      // let newGroups = _.uniqBy(_.compact([...groups, newGroup]), "id");
       if (deleteGroupId) {
         newGroups = newGroups.filter(group => group.id !== deleteGroupId);
       }
-      console.log('newGroups',newGroups)
-
       setGroups(newGroups);
     } else {
       if (deleteGroupId) {
@@ -305,9 +324,8 @@ export default function EditorDemo(props) {
         }
       })
     );
-
     // 更新组
-    updateGroupsInfo(currentNodes);
+    updateGroupsInfo(currentNodes, "new");
     setSelectedNodes([]);
   };
 
@@ -376,7 +394,7 @@ export default function EditorDemo(props) {
           "paste",
           "delete",
           "dragSelect",
-          "layout",
+          // "layout",
           "adapt",
           "group"
         ]}
@@ -425,6 +443,7 @@ export default function EditorDemo(props) {
         selectedLinks={selectedLinks}
         setSelectedLinks={setSelectedLinks}
         selectedNodes={selectedNodes}
+        setGroups={setGroups}
         setSelectedNodes={setSelectedNodes}
         updateNodes={updateNodes}
         updateLinks={updateLinks}
