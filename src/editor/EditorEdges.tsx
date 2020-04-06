@@ -184,8 +184,12 @@ export function EditorEdges(props: EditorEdgesProps) {
     return null;
   };
 
+  // 更新画布容器的高度
+  const width = document.body.scrollWidth;
+  const height = document.body.scrollHeight;
+
   return (
-    <svg className="editor-view-svg">
+    <svg className="editor-view-svg" width="552px" height="632px">
       {links && edgesPath}
       {interactive && renderDraggingLink()}
     </svg>

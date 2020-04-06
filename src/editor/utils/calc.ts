@@ -23,9 +23,8 @@ export function distance(sourcePoint: Point, targetPoint: Point) {
  * @param targetPoint
  */
 export const quadratic = (sourcePoint: Point, targetPoint: Point): string => {
-  const ratio = detectZoom();
-  const sourceX = sourcePoint.x * ratio;
-  const targetX = targetPoint.x * ratio;
+  const sourceX = sourcePoint.x;
+  const targetX = targetPoint.x;
 
   const centerX = (sourceX + targetX) / 2;
   const centerY = (sourcePoint.y + targetPoint.y) / 2;
@@ -93,7 +92,7 @@ export function getOffset(domNode: any, parentElem = window.document.body) {
   let offsetTop = 0;
   let offsetLeft = 0;
   let targetDomNode = domNode;
-  const ratio = detectZoom();
+
   while (targetDomNode !== parentElem && targetDomNode != null) {
     offsetLeft += targetDomNode.offsetLeft;
     offsetTop += targetDomNode.offsetTop;

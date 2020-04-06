@@ -230,8 +230,16 @@ export default class CanvasContent extends React.Component<
     event.preventDefault();
 
     const { offsetTop, offsetLeft } = getOffset(this.container.current);
-    const screenX = event.clientX - offsetLeft;
-    const screenY = event.clientY - offsetTop;
+    // 计算滚动条的位置
+    const scrollLeft =
+      document.documentElement.scrollLeft +
+      document.querySelector("#root").scrollLeft;
+    const scrollTop =
+      document.documentElement.scrollTop +
+      document.querySelector("#root").scrollTop;
+
+    const screenX = event.clientX - offsetLeft + scrollLeft;
+    const screenY = event.clientY - offsetTop + scrollTop;
 
     const { k, x, y } = this.props.currTrans;
 
@@ -350,8 +358,17 @@ export default class CanvasContent extends React.Component<
     const { setLinks, links, nodes } = this.props;
     const { dragLink } = this.state;
     const { offsetTop, offsetLeft } = getOffset(this.container.current);
-    const screenX = event.clientX - offsetLeft;
-    const screenY = event.clientY - offsetTop;
+
+    // 计算滚动条的位置
+    const scrollLeft =
+      document.documentElement.scrollLeft +
+      document.querySelector("#root").scrollLeft;
+    const scrollTop =
+      document.documentElement.scrollTop +
+      document.querySelector("#root").scrollTop;
+
+    const screenX = event.clientX - offsetLeft + scrollLeft;
+    const screenY = event.clientY - offsetTop + scrollTop;
 
     const { k, x, y } = this.props.currTrans;
 
@@ -497,12 +514,12 @@ export default class CanvasContent extends React.Component<
           this.handleNodeIsOverGroup(group, dragNode);
         } else {
           // 考虑是否在组内
-          if(checkNodeIsOverGroup(dragNode, group,"enter") === "in") {
+          if (checkNodeIsOverGroup(dragNode, group, "enter") === "in") {
             const newNodes = [...nodes, dragNode];
             // 更新组，重新计算组的宽度
             updateGroups(newNodes);
           } else {
-            updateGroups(nodes)
+            updateGroups(nodes);
           }
         }
       });
@@ -640,8 +657,16 @@ export default class CanvasContent extends React.Component<
   onDrop(event: React.DragEvent<HTMLDivElement>) {
     const { setNodes, nodes, dragNode } = this.props;
     const { offsetTop, offsetLeft } = getOffset(this.container.current);
-    const screenX = event.clientX - offsetLeft;
-    const screenY = event.clientY - offsetTop;
+    // 计算滚动条的位置
+    const scrollLeft =
+      document.documentElement.scrollLeft +
+      document.querySelector("#root").scrollLeft;
+    const scrollTop =
+      document.documentElement.scrollTop +
+      document.querySelector("#root").scrollTop;
+
+    const screenX = event.clientX - offsetLeft + scrollLeft;
+    const screenY = event.clientY - offsetTop + scrollTop;
 
     const { k, x, y } = this.props.currTrans;
 

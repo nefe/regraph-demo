@@ -1,8 +1,8 @@
 .editor-view {
   .editor-view-svg {
-    // é²æ­¢svgç»å¸æ¡ä½èåå³é®
-    width: 1px;
     overflow: visible;
+    pointer-events: none;
+    position:absolute;
   }
 
   .link-icon {
